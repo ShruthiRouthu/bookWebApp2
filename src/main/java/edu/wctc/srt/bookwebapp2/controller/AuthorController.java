@@ -36,6 +36,10 @@ public class AuthorController extends HttpServlet {
     private static final String UPDATE_ACTION = "update";
     private static final String DELETE_ACTION = "delete";
     private static final String ACTION_PARAM = "action";
+    private static final String DELETE_PAGE = "/deleteAuthor.jsp";
+    private static final String MANAGE_PAGE = "/manageAuthors.jsp";
+    private static final String DELETE_FORM = "deleteForm";
+    private static final String MANAGE_ACTION = "manage";
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -87,13 +91,37 @@ public class AuthorController extends HttpServlet {
                 request.setAttribute("authors", authors);
                 destination = LIST_PAGE;
 
-            } else if (action.equals("ADD_ACTION")) {
+            } else if (action.equals(ADD_ACTION)) {
                 // coming soon
-            } else if (action.equals("UPDATE_ACTION")) {
+            } else if (action.equals(UPDATE_ACTION)) {
                 // coming soon
-            } else if (action.equals("DELETE_ACTION")) {
-                // coming soon
-            } else {
+            } else if (action.equals(DELETE_ACTION)) {
+                List<Author> authors = null;
+                authors = authService.getAllAuthors();
+                request.setAttribute("authors", authors);
+                destination = DELETE_PAGE;
+            } else if (action.equals(DELETE_FORM)) {
+                String id; 
+                id  = request.getParameter("authorSelected");
+                if(id != null)
+                {
+                    authService.deleteAuthorByID("author_id", id);
+                }
+                List<Author> authors = null;
+                authors = authService.getAllAuthors();
+                request.setAttribute("authors", authors);
+                destination = DELETE_PAGE;
+                
+            } else if (action.equals(MANAGE_ACTION)) {
+                List<Author> authors = null;
+                authors = authService.getAllAuthors();
+                request.setAttribute("authors", authors);
+                destination =  MANAGE_PAGE;
+            } else if (action.equals("manageForm")) {
+                
+                String name  = request.getParameter("authorName");
+                if(name != null) System.out.println(name);
+            }else {
                 // no param identified in request, must be an error
                 request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
                 destination = LIST_PAGE;
