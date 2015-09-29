@@ -8,6 +8,7 @@ import edu.wctc.srt.bookwebapp2.model.DBStrategy;
 import edu.wctc.srt.bookwebapp2.model.MySqlDbStrategy;
 import edu.wctc.srt.bookwebapp2.model.AuthorService;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -31,14 +32,12 @@ public class AuthorController extends HttpServlet {
 
     private static final String NO_PARAM_ERR_MSG = "No request parameter identified";
     private static final String LIST_PAGE = "/listAuthors.jsp";
+    private static final String MANAGE_PAGE = "/manageAuthors.jsp";
     private static final String LIST_ACTION = "list";
     private static final String ADD_ACTION = "add";
-    private static final String UPDATE_ACTION = "update";
+    private static final String EDIT_ACTION = "edit";
     private static final String DELETE_ACTION = "delete";
     private static final String ACTION_PARAM = "action";
-    private static final String DELETE_PAGE = "/deleteAuthor.jsp";
-    private static final String MANAGE_PAGE = "/manageAuthors.jsp";
-    private static final String DELETE_FORM = "deleteForm";
     private static final String MANAGE_ACTION = "manage";
 
     /**
@@ -71,7 +70,7 @@ public class AuthorController extends HttpServlet {
         
        
         AuthorService authService = new AuthorService(authDao);
-
+      
         try {
             /*
              Here's what the connection pool version looks like.
@@ -92,35 +91,66 @@ public class AuthorController extends HttpServlet {
                 destination = LIST_PAGE;
 
             } else if (action.equals(ADD_ACTION)) {
-                // coming soon
-            } else if (action.equals(UPDATE_ACTION)) {
-                // coming soon
-            } else if (action.equals(DELETE_ACTION)) {
+                String name  = request.getParameter("authorName");
+                String dateAdded = request.getParameter("dateAdded");
+                if((name != null) && (dateAdded != null))
+                {
+                    List<String> key = new ArrayList();
+                    key.add( "author_name");
+                    key.add("date_added");
+                
+                    List<Object> value = new ArrayList();
+                    value.add(name);
+                    value.add(dateAdded);
+                    
+                    authService.insertAuthor(key, value);
+                                  
+                }
+                
                 List<Author> authors = null;
                 authors = authService.getAllAuthors();
                 request.setAttribute("authors", authors);
-                destination = DELETE_PAGE;
-            } else if (action.equals(DELETE_FORM)) {
-                String id; 
-                id  = request.getParameter("authorSelected");
+                destination = MANAGE_PAGE;
+                
+                
+            } else if (action.equals(DELETE_ACTION)) {
+                String id  = request.getParameter("authorID");
                 if(id != null)
                 {
                     authService.deleteAuthorByID("author_id", id);
                 }
+                
                 List<Author> authors = null;
                 authors = authService.getAllAuthors();
                 request.setAttribute("authors", authors);
-                destination = DELETE_PAGE;
-                
-            } else if (action.equals(MANAGE_ACTION)) {
-                List<Author> authors = null;
-                authors = authService.getAllAuthors();
-                request.setAttribute("authors", authors);
-                destination =  MANAGE_PAGE;
-            } else if (action.equals("manageForm")) {
-                
+                destination = MANAGE_PAGE;
+                               
+            } else if (action.equals(EDIT_ACTION)) {
                 String name  = request.getParameter("authorName");
-                if(name != null) System.out.println(name);
+                String dateAdded = request.getParameter("dateAdded");
+                String id = request.getParameter("authorID"); 
+                                
+                List<String> key = new ArrayList();
+                key.add( "author_name");
+                key.add("date_added");
+                
+                List<Object> value = new ArrayList();
+                value.add(name);
+                value.add(dateAdded);
+                
+                authService.updateAuthor("author_id", id , key, value);
+              
+                List<Author> authors = null;
+                authors = authService.getAllAuthors();
+                request.setAttribute("authors", authors);
+                destination = MANAGE_PAGE;
+                
+            } else if (action.equals(MANAGE_ACTION)) { 
+                
+                List<Author> authors = null;
+                authors = authService.getAllAuthors();
+                request.setAttribute("authors", authors);
+                destination = MANAGE_PAGE;                      
             }else {
                 // no param identified in request, must be an error
                 request.setAttribute("errMsg", NO_PARAM_ERR_MSG);

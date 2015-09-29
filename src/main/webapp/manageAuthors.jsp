@@ -18,7 +18,7 @@
     <body>
         <h1> Manage  Authors</h1>
         
-        <form id="manageForm" name="manageForm" method="POST" action="AuthorController?action=manageForm">    
+            
             <table width="500" border="1" cellspacing="0" cellpadding="4">
                 <tr style="background-color: black;color:white;">
                     <th align="left" class="tableHead">ID</th>
@@ -43,20 +43,23 @@
                 <td align="left">${a.name}</td>
                 <td align="right"><fmt:formatDate pattern="M/d/yyyy" value="${a.dateAdded}"></fmt:formatDate></td>
                 
-                <td> <input type="button" name="deleteAuthor" value="Delete" ></td>
+                <td> <input type="button" name="deleteAuthor" value="Delete" data-toggle="modal" data-target="#deleteModal" ></td>
                 <td> <input type="button" name="editAuthor" value="Edit" data-toggle="modal" data-target="#editModal"></td>
     
    
     <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
+          
+        <form id="editForm" name="editForm" method="POST" action="AuthorController?action=edit">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="myModalLabel">Update Author</h4>
           </div>
-          
-              <div class="modal-body">
-
+          <div class="modal-body">
+                
+                  <input type="hidden" name="authorID" id="authorID" value="${a.id}" >
+               
                   <div class="form-group">
                     <label for="authorName">Author Name:  </label>
                     <input  class="form-control" id="authorName" name="authorName" type="text" value="${a.name}" required>
@@ -67,16 +70,47 @@
                     <input  class="form-control" id="dateAdded" name="dateAdded" type="date" value="${a.dateAdded}" required>
                   </div>
 
-              </div>
-              <div class="modal-footer">
+          </div>
+          <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <button type="submit" class="btn btn-primary">Save changes</button>
-              </div>
-                  
-        
+          </div>
+        </form>
         </div>
       </div>
     </div>
+                        
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form id="deleteForm" name="deleteForm" method="POST" action="AuthorController?action=delete">  
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Delete Author</h4>
+          </div>
+        <div class="modal-body">
+                
+                  <input type="hidden" name="authorID" id="authorID" value="${a.id}" >
+                                
+                  <div class="form-group">
+                    <label for="authorName">Author Name:  </label>
+                    <input  class="form-control" id="authorName" name="authorName" type="text" value="${a.name}" required>
+                   </div>
+
+                  <div class="form-group">
+                    <label for="dateAdded">Date Added:  </label>
+                    <input  class="form-control" id="dateAdded" name="dateAdded" type="date" value="${a.dateAdded}" required>
+                  </div>
+
+        </div>
+        <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Delete</button>
+        </div>
+        </form>
+        </div>
+      </div>
+    </div>                    
            
             </tr>
             </c:forEach>
@@ -88,11 +122,42 @@
                     ${errMsg}</p>
             </c:if>
             
-           
-    </form>
-        
-        
-        
+            <br>
+            <input type="button"  name="addAuthor"  value="Add" data-toggle="modal" data-target="#addModal" >
+            <br>
+            
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <form id="addForm" name="addForm" method="POST" action="AuthorController?action=add">  
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Add Author</h4>
+          </div>
+            <div class="modal-body">
+                                                               
+                  <div class="form-group">
+                    <label for="authorName">Author Name:  </label>
+                    <input  class="form-control" id="authorName" name="authorName" type="text" value="" required>
+                   </div>
+
+                  <div class="form-group">
+                    <label for="dateAdded">Date Added:  </label>
+                    <input  class="form-control" id="dateAdded" name="dateAdded" type="date" value="" placeholder="Date format YYYY-MM-DD" required>
+                  </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+                
+   
+       
         <script src="https://code.jquery.com/jquery-2.1.4.min.js"> </script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js">  </script>
     </body>
