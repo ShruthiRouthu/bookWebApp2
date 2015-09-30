@@ -33,10 +33,12 @@ public class AuthorController extends HttpServlet {
     private static final String NO_PARAM_ERR_MSG = "No request parameter identified";
     private static final String LIST_PAGE = "/listAuthors.jsp";
     private static final String MANAGE_PAGE = "/manageAuthors.jsp";
+    private static final String EDIT_PAGE = "/editAuthor.jsp";
     private static final String LIST_ACTION = "list";
     private static final String ADD_ACTION = "add";
     private static final String EDIT_ACTION = "edit";
     private static final String DELETE_ACTION = "delete";
+    private static final String SHOW_EDITPAGE_ACTION = "showEditPage";
     private static final String ACTION_PARAM = "action";
     private static final String MANAGE_ACTION = "manage";
 
@@ -125,7 +127,27 @@ public class AuthorController extends HttpServlet {
                 request.setAttribute("authors", authors);
                 destination = MANAGE_PAGE;
                                
-            } else if (action.equals(EDIT_ACTION)) {
+            } else if (action.equals(SHOW_EDITPAGE_ACTION)) {
+                String id  = request.getParameter("authorID");
+                 if(id != null)
+                {
+                    List<Author> authors = authService.getAuthorsByValue("author_id", id);
+                    if(authors != null)
+                    {
+                        Author selectedAuth = null;
+                        for(Author a: authors){
+                            if(a.getId() == Integer.parseInt(id))
+                            {   selectedAuth = a;
+                                break ;
+                            }
+                        }
+                        request.setAttribute("selectedAuth", selectedAuth);
+                        destination = EDIT_PAGE;
+                    }
+                }
+            
+            }else if (action.equals(EDIT_ACTION)) {
+            
                 String name  = request.getParameter("authorName");
                 String dateAdded = request.getParameter("dateAdded");
                 String id = request.getParameter("authorID"); 
