@@ -10,6 +10,8 @@ public interface AuthorDAOStrategy {
     
     List<Author> getAuthorsByValue( String condColName, Object condColVal) throws Exception;
     
+    Author getAuthorByID( String pkName, Object pkValue) throws Exception;
+    
     int clearAuthorTable() throws Exception;
     
     int deleteAuthorByID(String pkName ,Object pkValue ) throws Exception;

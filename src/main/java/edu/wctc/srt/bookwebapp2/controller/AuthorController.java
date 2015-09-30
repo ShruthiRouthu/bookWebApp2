@@ -131,17 +131,10 @@ public class AuthorController extends HttpServlet {
                 String id  = request.getParameter("authorID");
                  if(id != null)
                 {
-                    List<Author> authors = authService.getAuthorsByValue("author_id", id);
-                    if(authors != null)
+                    Author author = authService.getAuthorByID("author_id", id);
+                    if(author != null)
                     {
-                        Author selectedAuth = null;
-                        for(Author a: authors){
-                            if(a.getId() == Integer.parseInt(id))
-                            {   selectedAuth = a;
-                                break ;
-                            }
-                        }
-                        request.setAttribute("selectedAuth", selectedAuth);
+                        request.setAttribute("selectedAuth", author);
                         destination = EDIT_PAGE;
                     }
                 }

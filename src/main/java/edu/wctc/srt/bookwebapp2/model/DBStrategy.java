@@ -24,6 +24,8 @@ public interface DBStrategy {
     
     List<Map<String,Object>> findRecordsByCondition(String tableName, String condColName, Object condColVal)throws SQLException ;
 
+    Map<String,Object> findRecordByID(String tableName, String pkName, Object pkVal)throws SQLException ;
+    
     int emptyTable(String tableName) throws SQLException;
     
     int deleteRecordByID(String tableName,String pkName ,Object pkValue ) throws SQLException;

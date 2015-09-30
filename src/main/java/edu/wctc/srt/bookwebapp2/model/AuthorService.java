@@ -21,6 +21,10 @@ public class AuthorService {
         return dao.getAuthorsByValue(condColName, condColVal);
     }
     
+    public Author getAuthorByID(String pkName, Object pkValue) throws Exception {
+        return dao.getAuthorByID( pkName, pkValue);
+    }
+    
     public final int clearAuthorTable() throws Exception {
         return dao.clearAuthorTable();
     }
@@ -53,7 +57,12 @@ public class AuthorService {
 //        for(Author a : Authors) {
 //            System.out.println(a);
 //        }            
-//       
+//
+        
+// AUTHORS BY ID
+//        Author author = service.getAuthorByID("author_id", 32);
+//            System.out.println(author);           
+
         
 //LISTS FOR UPDATE < INSERT 
 //        List<String> key = new ArrayList();

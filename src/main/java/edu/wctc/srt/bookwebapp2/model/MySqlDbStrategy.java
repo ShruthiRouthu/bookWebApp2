@@ -79,6 +79,30 @@ public class MySqlDbStrategy implements DBStrategy {
         
     }
     
+     @Override
+    public Map<String, Object> findRecordByID(String tableName, String pkName, Object pkVal) throws SQLException {
+        
+        String sql = "SELECT * FROM " + tableName + " WHERE " +  pkName + " = ? " ;
+        if(debug) System.out.println(sql);
+        
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setObject(1,pkVal);
+        
+        ResultSet rs = stmt.executeQuery();
+        ResultSetMetaData metaData = rs.getMetaData();
+        
+        int columnCount = metaData.getColumnCount();
+        Map<String,Object> record = new  HashMap<>();
+        
+         while( rs.next()){
+            for(int i=1; i <= columnCount; i++){
+                record.put(metaData.getColumnName(i), rs.getObject(i));
+            }  
+        }
+        
+        return record;
+    }
+    
     @Override
     public final int emptyTable(String tableName) throws SQLException{
         
@@ -194,6 +218,10 @@ public class MySqlDbStrategy implements DBStrategy {
 //        List<Map<String,Object>> records = db.findRecordsByCondition("author","author_id", 21);
 //        for(Map record : records) 
 //           {  System.out.println(record);  }
+       
+//FIND RECORDS BY ID 
+//        Map<String,Object> record = db.findRecordByID("author","author_id", 32);
+//             System.out.println(record);        
 
 //EMPTY THE TABLE        
 //      int no = db.emptyTable("author");
@@ -229,5 +257,7 @@ public class MySqlDbStrategy implements DBStrategy {
       
         db.conn.close(); 
     }
+
+   
 }
 

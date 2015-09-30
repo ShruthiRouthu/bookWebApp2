@@ -73,6 +73,31 @@ public class AuthorDAO implements AuthorDAOStrategy {
         return finalList ;
         
     }
+    
+     @Override
+    public Author getAuthorByID(String pkName, Object pkValue) throws Exception {
+        
+        Author selectedAuthor ;
+        dbStrat.openConnection(driverClassName, url, userName, password);
+        
+        Map<String,Object> rawData =  dbStrat.findRecordByID("author",pkName ,pkValue);
+        
+            Author author = new Author();
+           
+            Object obj = (rawData.get("author_id")== null)? "" : rawData.get("author_id");
+            author.setId(Integer.parseInt(obj.toString()));
+            
+            obj = (rawData.get("author_name")== null)? "" : rawData.get("author_name");
+            author.setName(obj.toString());
+            
+            obj = (rawData.get("date_added")== null)? "" : rawData.get("date_added");
+            author.setDateAdded((Date)obj);
+            
+            
+        
+        dbStrat.closeConnection();
+        return author;
+    }
    
     @Override
     public final int clearAuthorTable() throws Exception {
@@ -128,7 +153,10 @@ public class AuthorDAO implements AuthorDAOStrategy {
 //        for(Author a : list) {
 //            System.out.println(a);
 //        }            
-       
+
+//AUTHOR BY ID 
+//        Author author  = dao.getAuthorByID("author_id", 32);
+//        System.out.println(author);         
         
 //LISTS FOR UPDATE < INSERT 
 //        List<String> key = new ArrayList();
@@ -152,6 +180,8 @@ public class AuthorDAO implements AuthorDAOStrategy {
 //        System.out.println(dao.clearAuthorTable());
         
     }
+
+   
 
    
     
