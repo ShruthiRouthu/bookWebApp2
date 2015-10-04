@@ -4,6 +4,7 @@ package edu.wctc.srt.bookwebapp2.controller;
 import edu.wctc.srt.bookwebapp2.model.Author;
 import edu.wctc.srt.bookwebapp2.model.AuthorDAO;
 import edu.wctc.srt.bookwebapp2.model.AuthorDAOStrategy;
+import edu.wctc.srt.bookwebapp2.model.AuthorDAOUsingConnectionPool;
 import edu.wctc.srt.bookwebapp2.model.DBStrategy;
 import edu.wctc.srt.bookwebapp2.model.MySqlDbStrategy;
 import edu.wctc.srt.bookwebapp2.model.AuthorService;
@@ -205,6 +206,12 @@ public class AuthorController extends HttpServlet {
             }
             else {
                 // Do something for connection pool
+                // Find the connection pool and create the DataSource     
+                Context ctx = new InitialContext();
+                DataSource ds = (DataSource) ctx.lookup("jdbc/book");
+
+                authorDAOStrategy = new AuthorDAOUsingConnectionPool(new MySqlDbStrategy(),ds);
+                authorService =  new AuthorService(authorDAOStrategy);
             }
         } catch ( Exception e) {
             System.out.println(e.getMessage());
@@ -212,7 +219,9 @@ public class AuthorController extends HttpServlet {
         
         return authorService;
        
-    } 
+    }
+    
+   
     
     @Override
     public void init() throws ServletException {
