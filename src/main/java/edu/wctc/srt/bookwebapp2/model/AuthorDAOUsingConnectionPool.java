@@ -1,33 +1,35 @@
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package edu.wctc.srt.bookwebapp2.model;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 
-public class AuthorDAO implements AuthorDAOStrategy {
+/**
+ *
+ * @author Professional
+ */
+public class AuthorDAOUsingConnectionPool implements AuthorDAOStrategy {
+
+    private DBStrategy dbStrat;
+    private DataSource ds;
     
-    private DBStrategy dbStrat; 
-    private String driverClassName;
-    private String url;
-    private String userName;
-    private String password;
-
-    public AuthorDAO(DBStrategy dbStrat, String driverClassName, String url, String userName, String password) {
+    public AuthorDAOUsingConnectionPool(DBStrategy dbStrat, DataSource ds) {
         this.dbStrat = dbStrat;
-        this.driverClassName = driverClassName;
-        this.url = url;
-        this.userName = userName;
-        this.password =password; 
+        this.ds = ds;
     }
-    
+     
     @Override
     public final List<Author> getAllAuthors() throws Exception {
         
         List<Author> finalList = new ArrayList<>();
-        dbStrat.openConnection(driverClassName, url, userName, password);
+        dbStrat.openConnection(ds);
         
         List<Map<String,Object>> rawData =  dbStrat.findAllRecords("author");
         
@@ -45,14 +47,14 @@ public class AuthorDAO implements AuthorDAOStrategy {
             
             finalList.add(a);
         }
-        
+       
         return finalList ;
     }
     
     @Override
     public List<Author> getAuthorsByValue(String condColName, Object condColVal) throws Exception {
         List<Author> finalList = new ArrayList<>();
-        dbStrat.openConnection(driverClassName, url, userName, password);
+        dbStrat.openConnection(ds);
         
         List<Map<String,Object>> rawData =  dbStrat.findRecordsByCondition("author",condColName ,condColVal);
         for(Map m : rawData){
@@ -78,7 +80,7 @@ public class AuthorDAO implements AuthorDAOStrategy {
     public Author getAuthorByID(String pkName, Object pkValue) throws Exception {
         
         Author selectedAuthor ;
-        dbStrat.openConnection(driverClassName, url, userName, password);
+        dbStrat.openConnection(ds);
         
         Map<String,Object> rawData =  dbStrat.findRecordByID("author",pkName ,pkValue);
         
@@ -92,27 +94,23 @@ public class AuthorDAO implements AuthorDAOStrategy {
             
             obj = (rawData.get("date_added")== null)? "" : rawData.get("date_added");
             author.setDateAdded((Date)obj);
-            
-            
-        
-       
+      
         return author;
     }
    
     @Override
     public final int clearAuthorTable() throws Exception {
-        dbStrat.openConnection(driverClassName, url, userName, password);
+        dbStrat.openConnection(ds);
         int authorsDeleted = dbStrat.emptyTable("author");
-       
+        
         return authorsDeleted;
     }
 
     @Override
     public final int deleteAuthorByID(String pkName, Object pkValue) throws Exception {
-        dbStrat.openConnection(driverClassName, url, userName, password);
+        dbStrat.openConnection(ds);
         int authorsDeleted = dbStrat.deleteRecordByID("author", pkName, pkValue);
-        
-        
+         
         return authorsDeleted;
     }
 
@@ -120,67 +118,18 @@ public class AuthorDAO implements AuthorDAOStrategy {
     public final int updateAuthor(String conditionColName, Object conditionColValue, 
             List<String> keyList, List<Object> valueList) throws Exception {
         
-        dbStrat.openConnection(driverClassName, url, userName, password);
+        dbStrat.openConnection(ds);
         int authorsUpdated = dbStrat.updateRecord("author", conditionColName, conditionColValue, keyList, valueList);
-        
-        
+       
         return authorsUpdated;
     }
 
     @Override
     public final int insertAuthor(List<String> colNameList, List<Object> colValueList) throws Exception {
-        dbStrat.openConnection(driverClassName, url, userName, password);
+        dbStrat.openConnection(ds);
         int authorsInserted = dbStrat.insertRecord("author", colNameList, colValueList);
-
+         
         return authorsInserted;
     }
-    
-    
-    public static void main(String[] args) throws Exception {
-        DBStrategy db = new  MySqlDbStrategy();
-      //  AuthorDAO dao = new AuthorDAO(db,"com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/book","root","DJ2015");
-        
-// ALL AUTHORS
-//        List<Author> list = dao.getAllAuthors();
-//        for(Author a : list) {
-//            System.out.println(a);
-//        }
-        
-// AUTHORS BY SOME CONDITION
-//        List<Author> list = dao.getAuthorsByValue("author_name", "Matt");
-//        for(Author a : list) {
-//            System.out.println(a);
-//        }            
-
-//AUTHOR BY ID 
-//        Author author  = dao.getAuthorByID("author_id", 32);
-//        System.out.println(author);         
-        
-//LISTS FOR UPDATE < INSERT 
-//        List<String> key = new ArrayList();
-//        key.add( "author_name");
-//        key.add("date_added");
-//        
-//        List<Object> value = new ArrayList();
-//        value.add("Obama");
-//        value.add("2000-06-29");
-        
-//INSERT AUTHOR        
-//        System.out.println(dao.insertAuthor( key, value));
-        
-//UPDATE AUTHOR
-//        System.out.println(dao.updateAuthor("author_id", 13, key, value));
-        
-//DELETE AUTHOR BY ID
-//            System.out.println(dao.deleteAuthorByID("author_id", 13));
-            
-//DELETE ALL AUTHORS
-//        System.out.println(dao.clearAuthorTable());
-        
-    }
-
-   
-
-   
     
 }

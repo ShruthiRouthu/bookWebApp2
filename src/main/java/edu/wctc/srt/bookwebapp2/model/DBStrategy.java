@@ -8,6 +8,7 @@ package edu.wctc.srt.bookwebapp2.model;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 
 /**
  *
@@ -18,7 +19,9 @@ public interface DBStrategy {
     // Exception will be handled where the notifications are needed. Do validation too
     void openConnection(String driverClass, String url, String userName, String password) throws Exception;
     
-    void closeConnection() throws SQLException;
+    void openConnection(DataSource ds) throws Exception;
+    
+    //void closeConnection() throws SQLException;
 
     List<Map<String, Object>> findAllRecords(String tableName) throws SQLException;
     

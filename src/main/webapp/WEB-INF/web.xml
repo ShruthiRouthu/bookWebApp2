@@ -1,21 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    
     <servlet>
-        <servlet-name>TestServlet</servlet-name>
-        <servlet-class>edu.wctc.srt.bookwebapp2.controller.TestServlet</servlet-class>
+        <!-- first alias, private to config -->
+        <servlet-name>AuthorController</servlet-name>
+        <servlet-class>edu.wctc.srt.bookwebapp2.controller.AuthorController</servlet-class>
+        <init-param>
+            <param-name>authorDAO</param-name>
+            <param-value>edu.wctc.srt.bookwebapp2.model.AuthorDAO</param-value>
+        </init-param>
+        <init-param>
+            <param-name>dbStrategy</param-name>
+            <param-value>edu.wctc.srt.bookwebapp2.model.MySqlDbStrategy</param-value>
+        </init-param>
+        <init-param>
+            <param-name>driverClass</param-name>
+            <param-value>com.mysql.jdbc.Driver</param-value>
+        </init-param>
+        <init-param>
+            <param-name>url</param-name>
+            <param-value>jdbc:mysql://localhost:3306/book</param-value>
+        </init-param>
+        <init-param>
+            <param-name>userName</param-name>
+            <param-value>root</param-value>
+        </init-param>
+        <init-param>
+            <param-name>password</param-name>
+            <param-value>DJ2015</param-value>
+        </init-param>
+        
+        
+        
+        <!-- must be last item in servlet config -->
+        <load-on-startup>1</load-on-startup>
     </servlet>
+    
     <servlet-mapping>
-        <servlet-name>TestServlet</servlet-name>
-        <url-pattern>/TestServlet</url-pattern>
+        <!-- reference private config alias -->
+        <servlet-name>AuthorController</servlet-name>
+        <!-- second alias is the one you use in your links -->
+        <url-pattern>/AuthorController</url-pattern>
     </servlet-mapping>
+    
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
     
-    <context-param>
-        <param-name>email</param-name>
-        <param-value>srouthu@my.wctc.edu</param-value>
-    </context-param>
 </web-app>

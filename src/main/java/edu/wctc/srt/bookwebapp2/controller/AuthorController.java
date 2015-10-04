@@ -8,8 +8,11 @@ import edu.wctc.srt.bookwebapp2.model.DBStrategy;
 import edu.wctc.srt.bookwebapp2.model.MySqlDbStrategy;
 import edu.wctc.srt.bookwebapp2.model.AuthorService;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
@@ -20,11 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-/**
- * The main controller for author-related activities
- *
- * @author jlombardo
- */
+
 @WebServlet(name = "AuthorController", urlPatterns = {"/AuthorController"})
 public class AuthorController extends HttpServlet {
 
@@ -41,16 +40,19 @@ public class AuthorController extends HttpServlet {
     private static final String SHOW_EDITPAGE_ACTION = "showEditPage";
     private static final String ACTION_PARAM = "action";
     private static final String MANAGE_ACTION = "manage";
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    
+    
+    // variables to hold data from xml
+    String authorDAOStrategyClassName ;
+    String dbStrategyClassName ;
+    String driverClass ;
+    String url;
+    String user ;
+    String password ;
+    
+    DBStrategy dbStrategy ;
+    AuthorDAOStrategy authorDAOStrategy;
+   
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -58,34 +60,28 @@ public class AuthorController extends HttpServlet {
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
 
-        /*
-         For now we are hard-coding the strategy objects into this
-         controller. In the future we'll auto inject them from a config
-         file. Also, the DAO opens/closes a connection on each method call,
-         which is not very efficient. In the future we'll learn how to use
-         a connection pool to improve this.
-         */
-        DBStrategy db = new MySqlDbStrategy();
-        AuthorDAOStrategy authDao
-                = new AuthorDAO(db, "com.mysql.jdbc.Driver",
-                        "jdbc:mysql://localhost:3306/book", "root", "DJ2015");
+         
+//        DBStrategy db = new MySqlDbStrategy();
+//        AuthorDAOStrategy authDao
+//                = new AuthorDAO(db, "com.mysql.jdbc.Driver",
+//                        "jdbc:mysql://localhost:3306/book", "root", "DJ2015");
+     
+//       AuthorService authService = new AuthorService(authDao);
         
-       
-        AuthorService authService = new AuthorService(authDao);
+        AuthorService authService = null;
+        System.out.println("Shruthi 1");
+        try{ 
+            System.out.println("Shruthi 2");
+            authService = getAuthorService();
+        }
+        catch (Exception ex)
+                {
+                    System.out.println("Didnot get service from method !");
+                    System.out.println(ex.getCause().getMessage());
+                }
+
       
         try {
-            /*
-             Here's what the connection pool version looks like.
-             */
-//            Context ctx = new InitialContext();
-//            DataSource ds = (DataSource)ctx.lookup("jdbc/book");
-//            AuthorDaoStrategy authDao = new ConnPoolAuthorDao(ds, new MySqlDbStrategy());
-//            AuthorService authService = new AuthorService(authDao);
-
-            /*
-             Determine what action to take based on a passed in QueryString
-             Parameter
-             */
             if (action.equals(LIST_ACTION)) {
                 List<Author> authors = null;
                 authors = authService.getAllAuthors();
@@ -180,6 +176,54 @@ public class AuthorController extends HttpServlet {
         RequestDispatcher dispatcher
                 = getServletContext().getRequestDispatcher(destination);
         dispatcher.forward(request, response);
+    }
+    
+    private AuthorService getAuthorService() throws Exception {
+    
+        AuthorService authorService = null;
+        //System.out.println("Shruthi ");
+        try {
+            // get dbstrategy set up
+            Class dbClassName = Class.forName(dbStrategyClassName) ;
+            dbStrategy = (DBStrategy)dbClassName.newInstance();   // here we are casting but casting it to 
+                                                                  // interface not concrete class
+            
+            // get authordao set up
+            Class daoClassName = Class.forName(authorDAOStrategyClassName);
+            
+            Constructor constructor = null ;
+            
+            try{
+            constructor = daoClassName.getConstructor(new Class[] {DBStrategy.class, String.class,
+                String.class ,String.class, String.class});
+            } catch (NoSuchMethodException e) {}
+            
+            if(constructor != null){
+                Object[] argsForConstructor = new Object[] {dbStrategy, driverClass, url, user, password};
+                authorDAOStrategy = (AuthorDAOStrategy)constructor.newInstance(argsForConstructor);  
+                authorService =  new AuthorService(authorDAOStrategy);
+            }
+            else {
+                // Do something for connection pool
+            }
+        } catch ( Exception e) {
+            System.out.println(e.getMessage());
+        }
+        
+        return authorService;
+       
+    } 
+    
+    @Override
+    public void init() throws ServletException {
+        
+        authorDAOStrategyClassName = getServletConfig().getInitParameter("authorDAO");
+        dbStrategyClassName = getServletConfig().getInitParameter("dbStrategy");
+        driverClass = getServletConfig().getInitParameter("driverClass");
+        url = getServletConfig().getInitParameter("url");
+        user  = getServletConfig().getInitParameter("userName"); 
+        password = getServletConfig().getInitParameter("password"); 
+        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

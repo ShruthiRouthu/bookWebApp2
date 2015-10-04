@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 
 public class MySqlDbStrategy implements DBStrategy {
     
@@ -22,12 +23,18 @@ public class MySqlDbStrategy implements DBStrategy {
     // Exception will be handled where the notifications are needed. Do validation too
     @Override
     public final void openConnection(String driverClass, String url, String userName, String password) throws Exception{     
-        Class.forName (driverClass);
+        Class.forName (driverClass); // why am i doing this ???
         conn = DriverManager.getConnection(url, userName, password);
     }
     
     @Override
-    public final void closeConnection() throws SQLException{
+    public void openConnection(DataSource ds) throws Exception {
+        conn = ds.getConnection();
+    }
+
+    
+  //  @Override
+    private final void closeConnection() throws SQLException{
         conn.close();
     }
     
@@ -48,6 +55,9 @@ public class MySqlDbStrategy implements DBStrategy {
             }
             recordList.add(record);    
         }
+        
+        stmt.close();
+        closeConnection();
         
         return recordList;
     }
@@ -75,6 +85,8 @@ public class MySqlDbStrategy implements DBStrategy {
             recordList.add(record);    
         }
         
+        stmt.close();
+        closeConnection(); 
         return recordList;
         
     }
@@ -100,6 +112,8 @@ public class MySqlDbStrategy implements DBStrategy {
             }  
         }
         
+        stmt.close();
+        closeConnection(); 
         return record;
     }
     
@@ -110,6 +124,9 @@ public class MySqlDbStrategy implements DBStrategy {
         Statement stmt = conn.createStatement();
         int noOfRecords = stmt.executeUpdate(sql);
         
+        
+        stmt.close();
+        closeConnection();
         return noOfRecords;
         
     }
@@ -123,7 +140,13 @@ public class MySqlDbStrategy implements DBStrategy {
         stmt.setObject(1 , pkValue);
         if(debug)System.out.println(sql);
         int recordsDeleted = stmt.executeUpdate();
-        return  recordsDeleted;
+        
+        
+        int recordsUpdated = stmt.executeUpdate();
+        stmt.close();
+        closeConnection();
+        
+        return  recordsUpdated ;
     }
     
     // Will validate later
@@ -142,7 +165,12 @@ public class MySqlDbStrategy implements DBStrategy {
         
         stmt.setObject(index, conditionColValue); 
         
-        return stmt.executeUpdate();
+        int recordsUpdated = stmt.executeUpdate();
+        stmt.close();
+        closeConnection();
+        
+        return  recordsUpdated ;
+        
     }
     
     @Override
@@ -157,7 +185,11 @@ public class MySqlDbStrategy implements DBStrategy {
             stmt.setObject(index, value);
         }
         
-        return stmt.executeUpdate(); 
+        int recordsUpdated = stmt.executeUpdate();
+        stmt.close();
+        closeConnection();
+        
+        return  recordsUpdated ;
     }
 
     private String buildInsertSql(String tableName,List<String> colNameList){
@@ -184,6 +216,7 @@ public class MySqlDbStrategy implements DBStrategy {
         sql += ");" ;
         if(debug) System.out.println(sql);
          
+        
         return sql;  
     }
     
@@ -215,19 +248,19 @@ public class MySqlDbStrategy implements DBStrategy {
 //         {  System.out.println(record);  }
 
 //FIND RECORDS BY SOME VALUE / CONDITION
-//        List<Map<String,Object>> records = db.findRecordsByCondition("author","author_id", 21);
+//        List<Map<String,Object>> records = db.findRecordsByCondition("author","author_name", "Jim");
 //        for(Map record : records) 
 //           {  System.out.println(record);  }
-       
+//       
 //FIND RECORDS BY ID 
-//        Map<String,Object> record = db.findRecordByID("author","author_id", 32);
+//        Map<String,Object> record = db.findRecordByID("author","author_id", 28);
 //             System.out.println(record);        
 
 //EMPTY THE TABLE        
 //      int no = db.emptyTable("author");
         
 //DELETE RECORDS BY ID  
-//      int no = db.deleteRecordByID("author","author_id", 23);
+//      int no = db.deleteRecordByID("author","author_id", 40);
 //      System.out.println(no);
        
 // LISTS FOR RUNNING INSERT OR UPDATE         
@@ -243,7 +276,7 @@ public class MySqlDbStrategy implements DBStrategy {
 //      System.out.println(db.insertRecord("author", key, value));
 
 //UPDATE A RECORD        
-//        System.out.println(db.updateRecord("author" ,"author_id", 2, key, value));   
+//       System.out.println(db.updateRecord("author" ,"author_id", 28, key, value));   
         
         
 //      HashMap<String,Object> hm=new HashMap<String,Object>();  
@@ -255,8 +288,10 @@ public class MySqlDbStrategy implements DBStrategy {
         
         
       
-        db.conn.close(); 
+       // db.conn.close(); 
     }
+
+    
 
    
 }
