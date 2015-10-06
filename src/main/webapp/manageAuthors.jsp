@@ -15,7 +15,7 @@
         <title>Manage Authors</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     </head>
-    <body bgcolor="${pageColor}" style="color: ${fontColor};">
+    <body style="background-color: ${pageColor};color: ${fontColor};">
         <h1> Manage  Authors</h1>
         
             

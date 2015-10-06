@@ -48,8 +48,7 @@ public class AuthorController extends HttpServlet {
     private static final String FONT_COLOR = "fontColor";
     private static final String PAGE_COLOR = "pageColor";
     
-    
-    // variables to hold data from xml
+ // variables to hold data from xml
     private String authorDAOStrategyClassName ;
     private String dbStrategyClassName ;
     private String driverClass ;
@@ -64,15 +63,16 @@ public class AuthorController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        String destination = LIST_PAGE;
-        String action = request.getParameter(ACTION_PARAM);
-        
         HttpSession session = request.getSession();
         ServletContext ctx = request.getServletContext();
         
-        String fontColor = request.getParameter("fontColor");
-        String pageColor = request.getParameter("pageColor");
+        String destination = LIST_PAGE;
+        String action = request.getParameter(ACTION_PARAM);
         
+        // Getting DATA from form
+        String fontColor = request.getParameter(FONT_COLOR);
+        String pageColor = request.getParameter(PAGE_COLOR);
+    
         if(fontColor != null && fontColor.length() > 0)
         {
             ctx.setAttribute(FONT_COLOR,fontColor);
@@ -80,11 +80,11 @@ public class AuthorController extends HttpServlet {
         
         if(pageColor != null && pageColor.length() > 0)
         {
-            ctx.setAttribute(PAGE_COLOR,pageColor);
+            session.setAttribute(PAGE_COLOR,pageColor);
         }
         
 
-         
+//  CODE FOR MANUAL INJECTION OF DEPENDENCIES         
 //        DBStrategy db = new MySqlDbStrategy();
 //        AuthorDAOStrategy authDao
 //                = new AuthorDAO(db, "com.mysql.jdbc.Driver",
@@ -92,6 +92,7 @@ public class AuthorController extends HttpServlet {
      
 //       AuthorService authService = new AuthorService(authDao);
         
+// Getting AuthorService from Helper method using connectionPOOLS and dependency injection using init parameters        
         AuthorService authService = null;
         try{ 
             authService = getAuthorService();
@@ -182,8 +183,10 @@ public class AuthorController extends HttpServlet {
                 authors = authService.getAllAuthors();
                 request.setAttribute("authors", authors);
                 destination = MANAGE_PAGE;
-            } else if(action.equals(HOME_ACTION)) { 
-                destination = HOME_PAGE;
+                
+//            } else if(action.equals(HOME_ACTION)) { 
+//                destination = HOME_PAGE;
+                
             }else {
                 // no param identified in request, must be an error
                 //request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
@@ -196,9 +199,14 @@ public class AuthorController extends HttpServlet {
 
         // Forward to destination page
        
+        if(action.equals(HOME_ACTION)){
+            response.sendRedirect(ctx.getContextPath() + HOME_PAGE);
+        }
+        else {
         RequestDispatcher dispatcher
                 = getServletContext().getRequestDispatcher(destination);
         dispatcher.forward(request, response);
+        }
         
     }
     
@@ -206,6 +214,7 @@ public class AuthorController extends HttpServlet {
     
         AuthorService authorService = null;
         try {
+            
             // get dbstrategy set up
             Class dbClassName = Class.forName(dbStrategyClassName) ;
             dbStrategy = (DBStrategy)dbClassName.newInstance();   // here we are casting but casting it to 
@@ -216,16 +225,18 @@ public class AuthorController extends HttpServlet {
             
             Constructor constructor = null ;
             
+            // so does it searche for constructor among all classes implementing AuthorDAOStrategy ?
             try{
             constructor = daoClassName.getConstructor(new Class[] {DBStrategy.class, String.class,
-                String.class ,String.class, String.class});
-            } catch (NoSuchMethodException e) {}
+                String.class ,String.class, String.class}); // getConstructor doesnot return null but throws
+            } catch (NoSuchMethodException e) {}            // an exception if it doesnot find the required constructor
             
             if(constructor != null){
                 Object[] argsForConstructor = new Object[] {dbStrategy, driverClass, url, user, password};
                 authorDAOStrategy = (AuthorDAOStrategy)constructor.newInstance(argsForConstructor);  
                 authorService =  new AuthorService(authorDAOStrategy);
             }
+            // this runs when using connection pools
             else { 
                 Context ctx = new InitialContext();
                 DataSource ds = (DataSource) ctx.lookup("jdbc/book");

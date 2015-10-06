@@ -7,7 +7,7 @@
         <servlet-class>edu.wctc.srt.bookwebapp2.controller.AuthorController</servlet-class>
         <init-param>
             <param-name>authorDAO</param-name>
-            <param-value>edu.wctc.srt.bookwebapp2.model.AuthorDAO</param-value>
+            <param-value>edu.wctc.srt.bookwebapp2.model.AuthorDAOUsingConnectionPool</param-value>
         </init-param>
         <init-param>
             <param-name>dbStrategy</param-name>
