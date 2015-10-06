@@ -17,7 +17,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Author List</title>
     </head>
-    <body>
+    <body bgcolor="${pageColor}" style="color: ${fontColor};">
         <h1>Author List</h1>
         <table width="500" border="1" cellspacing="0" cellpadding="4">
             <tr style="background-color: black;color:white;">
@@ -46,5 +46,7 @@
             <p style="font-weight: bold;color: red;width:500px;">Sorry, data could not be retrieved:<br>
                 ${errMsg}</p>
         </c:if>
+            
+           <a href="AuthorController?action=home">Home</a>
     </body>
 </html>

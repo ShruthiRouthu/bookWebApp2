@@ -15,7 +15,7 @@
         <title>Manage Authors</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     </head>
-    <body>
+    <body bgcolor="${pageColor}" style="color: ${fontColor};">
         <h1> Manage  Authors</h1>
         
             
@@ -154,6 +154,7 @@
       </div>
     </div>       
        
+        <a href="AuthorController?action=home">Home</a>
         <script src="https://code.jquery.com/jquery-2.1.4.min.js"> </script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js">  </script>
     </body>

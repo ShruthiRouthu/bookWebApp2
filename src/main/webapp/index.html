@@ -10,14 +10,17 @@
         <title>Book Demo App :: JDBC with SOA</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
-    <body>
+    <body  >
         <h1>Pick an Administrative Task</h1>
         <ol>
             <li><a href="AuthorController?action=list">View all Authors</a></li>
-          <!--  <li><a href="AuthorController?action=add">Add New Author</a></li>
-            <li><a href="AuthorController?action=update">Update an Author</a></li>
-            <li><a href="AuthorController?action=delete">Delete Authors</a></li> -->
             <li><a href="AuthorController?action=manage"> Manage Authors</a></li>
         </ol>
+        <br>
+        <form action="AuthorController?action=list" method="POST" >
+            font-color (application): <input type="text"  name="fontColor" value="" > <br><br>
+            page-color (session) : <input type="text" name="pageColor" value=""  > <br><br>
+            <input type="submit" value="submit" >
+        </form>
     </body>
 </html>

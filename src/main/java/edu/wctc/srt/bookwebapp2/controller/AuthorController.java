@@ -17,11 +17,13 @@ import java.util.logging.Logger;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 
@@ -34,6 +36,7 @@ public class AuthorController extends HttpServlet {
     private static final String LIST_PAGE = "/listAuthors.jsp";
     private static final String MANAGE_PAGE = "/manageAuthors.jsp";
     private static final String EDIT_PAGE = "/editAuthor.jsp";
+    private static final String HOME_PAGE = "/index.html";
     private static final String LIST_ACTION = "list";
     private static final String ADD_ACTION = "add";
     private static final String EDIT_ACTION = "edit";
@@ -41,18 +44,21 @@ public class AuthorController extends HttpServlet {
     private static final String SHOW_EDITPAGE_ACTION = "showEditPage";
     private static final String ACTION_PARAM = "action";
     private static final String MANAGE_ACTION = "manage";
+    private static final String HOME_ACTION = "home";
+    private static final String FONT_COLOR = "fontColor";
+    private static final String PAGE_COLOR = "pageColor";
     
     
     // variables to hold data from xml
-    String authorDAOStrategyClassName ;
-    String dbStrategyClassName ;
-    String driverClass ;
-    String url;
-    String user ;
-    String password ;
+    private String authorDAOStrategyClassName ;
+    private String dbStrategyClassName ;
+    private String driverClass ;
+    private String url;
+    private String user ;
+    private String password ;
     
-    DBStrategy dbStrategy ;
-    AuthorDAOStrategy authorDAOStrategy;
+    private DBStrategy dbStrategy ;
+    private AuthorDAOStrategy authorDAOStrategy;
    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -60,6 +66,23 @@ public class AuthorController extends HttpServlet {
 
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
+        
+        HttpSession session = request.getSession();
+        ServletContext ctx = request.getServletContext();
+        
+        String fontColor = request.getParameter("fontColor");
+        String pageColor = request.getParameter("pageColor");
+        
+        if(fontColor != null && fontColor.length() > 0)
+        {
+            ctx.setAttribute(FONT_COLOR,fontColor);
+        }
+        
+        if(pageColor != null && pageColor.length() > 0)
+        {
+            ctx.setAttribute(PAGE_COLOR,pageColor);
+        }
+        
 
          
 //        DBStrategy db = new MySqlDbStrategy();
@@ -70,16 +93,12 @@ public class AuthorController extends HttpServlet {
 //       AuthorService authService = new AuthorService(authDao);
         
         AuthorService authService = null;
-        System.out.println("Shruthi 1");
         try{ 
-            System.out.println("Shruthi 2");
             authService = getAuthorService();
         }
-        catch (Exception ex)
-                {
-                    System.out.println("Didnot get service from method !");
-                    System.out.println(ex.getCause().getMessage());
-                }
+        catch (Exception ex){
+            System.out.println(ex.getCause().getMessage());
+        }
 
       
         try {
@@ -162,10 +181,12 @@ public class AuthorController extends HttpServlet {
                 List<Author> authors = null;
                 authors = authService.getAllAuthors();
                 request.setAttribute("authors", authors);
-                destination = MANAGE_PAGE;                      
+                destination = MANAGE_PAGE;
+            } else if(action.equals(HOME_ACTION)) { 
+                destination = HOME_PAGE;
             }else {
                 // no param identified in request, must be an error
-                request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
+                //request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
                 destination = LIST_PAGE;
             }
             
@@ -174,15 +195,16 @@ public class AuthorController extends HttpServlet {
         }
 
         // Forward to destination page
+       
         RequestDispatcher dispatcher
                 = getServletContext().getRequestDispatcher(destination);
         dispatcher.forward(request, response);
+        
     }
     
     private AuthorService getAuthorService() throws Exception {
     
         AuthorService authorService = null;
-        //System.out.println("Shruthi ");
         try {
             // get dbstrategy set up
             Class dbClassName = Class.forName(dbStrategyClassName) ;
@@ -204,9 +226,7 @@ public class AuthorController extends HttpServlet {
                 authorDAOStrategy = (AuthorDAOStrategy)constructor.newInstance(argsForConstructor);  
                 authorService =  new AuthorService(authorDAOStrategy);
             }
-            else {
-                // Do something for connection pool
-                // Find the connection pool and create the DataSource     
+            else { 
                 Context ctx = new InitialContext();
                 DataSource ds = (DataSource) ctx.lookup("jdbc/book");
 
@@ -220,9 +240,7 @@ public class AuthorController extends HttpServlet {
         return authorService;
        
     }
-    
-   
-    
+ 
     @Override
     public void init() throws ServletException {
         

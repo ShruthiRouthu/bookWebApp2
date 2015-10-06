@@ -13,7 +13,7 @@
         <title>Edit Author</title>
          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     </head>
-    <body>
+    <body bgcolor="${pageColor}" style="color: ${fontColor};">
         <h1>Hello World!</h1>
          
         <form id="editForm" name="editForm" method="POST" action="AuthorController?action=edit">
