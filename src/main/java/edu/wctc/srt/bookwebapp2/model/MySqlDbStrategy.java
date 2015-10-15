@@ -23,7 +23,7 @@ public class MySqlDbStrategy implements DBStrategy {
     // Exception will be handled where the notifications are needed. Do validation too
     @Override
     public final void openConnection(String driverClass, String url, String userName, String password) throws Exception{     
-        Class.forName (driverClass); // why am i doing this ???
+        Class.forName (driverClass); 
         conn = DriverManager.getConnection(url, userName, password);
     }
     
@@ -31,9 +31,7 @@ public class MySqlDbStrategy implements DBStrategy {
     public void openConnection(DataSource ds) throws Exception {
         conn = ds.getConnection();
     }
-
-    
-  //  @Override
+  
     private final void closeConnection() throws SQLException{
         conn.close();
     }

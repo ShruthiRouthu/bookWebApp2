@@ -26,8 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+// THis is the current latest app
 
-@WebServlet(name = "AuthorController", urlPatterns = {"/AuthorController"})
+// Not using annotations bcause this servlet is configured using web.xml
 public class AuthorController extends HttpServlet {
 
     // NO MAGIC NUMBERS!
