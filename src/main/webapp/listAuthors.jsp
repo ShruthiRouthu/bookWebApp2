@@ -34,8 +34,8 @@
                     <tr style="background-color: #ccffff;">
                 </c:otherwise>
             </c:choose>
-            <td align="left">${a.id}</td>
-            <td align="left">${a.name}</td>
+            <td align="left">${a.authorId}</td>
+            <td align="left">${a.authorName}</td>
             <td align="right">
                 <fmt:formatDate pattern="M/d/yyyy" value="${a.dateAdded}"></fmt:formatDate>
             </td>

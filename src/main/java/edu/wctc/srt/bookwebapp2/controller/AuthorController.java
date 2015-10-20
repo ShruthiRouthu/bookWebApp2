@@ -1,19 +1,18 @@
 package edu.wctc.srt.bookwebapp2.controller;
 
 
-import edu.wctc.srt.bookwebapp2.model.Author;
-import edu.wctc.srt.bookwebapp2.model.AuthorDAO;
-import edu.wctc.srt.bookwebapp2.model.AuthorDAOStrategy;
-import edu.wctc.srt.bookwebapp2.model.AuthorDAOUsingConnectionPool;
-import edu.wctc.srt.bookwebapp2.model.DBStrategy;
-import edu.wctc.srt.bookwebapp2.model.MySqlDbStrategy;
-import edu.wctc.srt.bookwebapp2.model.AuthorService;
+
+import edu.wctc.srt.bookwebapp2.entity.Author;
+import edu.wctc.srt.bookwebapp2.service.AbstractFacade;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
@@ -26,12 +25,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
-// THis is the current latest app
+// THis is the latest app with JPI
 
 // Not using annotations bcause this servlet is configured using web.xml
 public class AuthorController extends HttpServlet {
 
-    // NO MAGIC NUMBERS!
 
     private static final String NO_PARAM_ERR_MSG = "No request parameter identified";
     private static final String LIST_PAGE = "/listAuthors.jsp";
@@ -49,21 +47,14 @@ public class AuthorController extends HttpServlet {
     private static final String FONT_COLOR = "fontColor";
     private static final String PAGE_COLOR = "pageColor";
     
- // variables to hold data from xml
-    private String authorDAOStrategyClassName ;
-    private String dbStrategyClassName ;
-    private String driverClass ;
-    private String url;
-    private String user ;
-    private String password ;
-    
-    private DBStrategy dbStrategy ;
-    private AuthorDAOStrategy authorDAOStrategy;
+    @Inject
+    private AbstractFacade<Author> authService;
    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
+    // Session and context code------------------------------------
         HttpSession session = request.getSession();
         ServletContext ctx = request.getServletContext();
         
@@ -83,52 +74,48 @@ public class AuthorController extends HttpServlet {
         {
             session.setAttribute(PAGE_COLOR,pageColor);
         }
+    // Session and context code-----------------------------------
         
+        Author author = null;
 
-//  CODE FOR MANUAL INJECTION OF DEPENDENCIES         
-//        DBStrategy db = new MySqlDbStrategy();
-//        AuthorDAOStrategy authDao
-//                = new AuthorDAO(db, "com.mysql.jdbc.Driver",
-//                        "jdbc:mysql://localhost:3306/book", "root", "DJ2015");
-     
-//       AuthorService authService = new AuthorService(authDao);
+
         
 // Getting AuthorService from Helper method using connectionPOOLS and dependency injection using init parameters        
-        AuthorService authService = null;
-        try{ 
-            authService = getAuthorService();
-        }
-        catch (Exception ex){
-            System.out.println(ex.getCause().getMessage());
-        }
+//        AuthorService authService = null;
+//        try{ 
+//            authService = getAuthorService();
+//        }
+//        catch (Exception ex){
+//            System.out.println(ex.getCause().getMessage());
+//        }
 
       
         try {
             if (action.equals(LIST_ACTION)) {
+                
                 List<Author> authors = null;
-                authors = authService.getAllAuthors();
+                authors = authService.findAll();
                 request.setAttribute("authors", authors);
                 destination = LIST_PAGE;
 
             } else if (action.equals(ADD_ACTION)) {
                 String name  = request.getParameter("authorName");
-                String dateAdded = request.getParameter("dateAdded");
-                if((name != null) && (dateAdded != null))
+              //  String dateAdded = request.getParameter("dateAdded");
+              //  System.out.println(name + " " + dateAdded);
+              //  if((name != null) && (dateAdded != null))
+                if(name != null)
                 {
-                    List<String> key = new ArrayList();
-                    key.add( "author_name");
-                    key.add("date_added");
-                
-                    List<Object> value = new ArrayList();
-                    value.add(name);
-                    value.add(dateAdded);
-                    
-                    authService.insertAuthor(key, value);
-                                  
+                     author = new Author(0);
+                     author.setAuthorName(name);
+                     
+//                     SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
+//                     Date date = sdf.parse(dateAdded);
+                     author.setDateAdded(new Date());
+                          
                 }
                 
                 List<Author> authors = null;
-                authors = authService.getAllAuthors();
+                authors = authService.findAll();
                 request.setAttribute("authors", authors);
                 destination = MANAGE_PAGE;
                 
@@ -137,11 +124,12 @@ public class AuthorController extends HttpServlet {
                 String id  = request.getParameter("authorID");
                 if(id != null)
                 {
-                    authService.deleteAuthorByID("author_id", id);
+                    author = authService.find(new Integer(id));
+                    authService.remove(author);
                 }
                 
                 List<Author> authors = null;
-                authors = authService.getAllAuthors();
+                authors = authService.findAll();
                 request.setAttribute("authors", authors);
                 destination = MANAGE_PAGE;
                                
@@ -149,7 +137,7 @@ public class AuthorController extends HttpServlet {
                 String id  = request.getParameter("authorID");
                  if(id != null)
                 {
-                    Author author = authService.getAuthorByID("author_id", id);
+                    author = authService.find(new Integer(id));
                     if(author != null)
                     {
                         request.setAttribute("selectedAuth", author);
@@ -160,34 +148,32 @@ public class AuthorController extends HttpServlet {
             }else if (action.equals(EDIT_ACTION)) {
             
                 String name  = request.getParameter("authorName");
-                String dateAdded = request.getParameter("dateAdded");
+               // String dateAdded = request.getParameter("dateAdded");
                 String id = request.getParameter("authorID"); 
-                                
-                List<String> key = new ArrayList();
-                key.add( "author_name");
-                key.add("date_added");
                 
-                List<Object> value = new ArrayList();
-                value.add(name);
-                value.add(dateAdded);
-                
-                authService.updateAuthor("author_id", id , key, value);
+               // System.out.println("variables from form" + name + " " + dateAdded + " " +id);
+               
+                author = authService.find(new Integer(id));
+              //  System.out.println("Before changing"+author.getAuthorId() + " " + author.getAuthorName() + " " + author.getDateAdded());
+                author.setAuthorName(name);
+              //  System.out.println("Changed name : " + author.getAuthorName());
               
+              //  SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
+              //  Date date = sdf.parse(dateAdded);
+                author.setDateAdded(new Date());
+              //  System.out.println("Changed name : " + author.getDateAdded());
+                
                 List<Author> authors = null;
-                authors = authService.getAllAuthors();
+                authors = authService.findAll();
                 request.setAttribute("authors", authors);
                 destination = MANAGE_PAGE;
                 
             } else if (action.equals(MANAGE_ACTION)) { 
                 
                 List<Author> authors = null;
-                authors = authService.getAllAuthors();
+                authors = authService.findAll();
                 request.setAttribute("authors", authors);
-                destination = MANAGE_PAGE;
-                
-//            } else if(action.equals(HOME_ACTION)) { 
-//                destination = HOME_PAGE;
-                
+                destination = MANAGE_PAGE;   
             }else {
                 // no param identified in request, must be an error
                 //request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
@@ -211,7 +197,7 @@ public class AuthorController extends HttpServlet {
         
     }
     
-    private AuthorService getAuthorService() throws Exception {
+  /*  private AuthorService getAuthorService() throws Exception {
     
         AuthorService authorService = null;
         try {
@@ -251,17 +237,12 @@ public class AuthorController extends HttpServlet {
         
         return authorService;
        
-    }
+    } /*
  
     @Override
     public void init() throws ServletException {
         
-        authorDAOStrategyClassName = getServletConfig().getInitParameter("authorDAO");
-        dbStrategyClassName = getServletConfig().getInitParameter("dbStrategy");
-        driverClass = getServletConfig().getInitParameter("driverClass");
-        url = getServletConfig().getInitParameter("url");
-        user  = getServletConfig().getInitParameter("userName"); 
-        password = getServletConfig().getInitParameter("password"); 
+       
         
     }
 

@@ -35,17 +35,17 @@
                 </c:otherwise>
             </c:choose>
                         
-            <td align="left">${a.id}</td>
-            <td align="left">${a.name}</td>
+            <td align="left">${a.authorId}</td>
+            <td align="left">${a.authorName}</td>
             <td align="right"><fmt:formatDate pattern="M/d/yyyy" value="${a.dateAdded}"></fmt:formatDate></td>
             
-            <td> <input type="button" name="deleteAuthor" value="Delete" onclick="location.href='AuthorController?action=delete&authorID=${a.id}'" /></td>
+            <td> <input type="button" name="deleteAuthor" value="Delete" onclick="location.href='AuthorController?action=delete&authorID=${a.authorId}'" /></td>
     
-            <td> <input type="button" name="editAuthor" value="Edit" onclick="location.href='AuthorController?action=showEditPage&authorID=${a.id}'"></td>                
+            <td> <input type="button" name="editAuthor" value="Edit" onclick="location.href='AuthorController?action=showEditPage&authorID=${a.authorId}'"></td>                
                  
            
             </tr>
-            </c:forEach>
+        </c:forEach>
             
             </table>
             
@@ -75,10 +75,10 @@
                     <input  class="form-control" id="authorName" name="authorName" type="text" value="" required>
                    </div>
 
-                  <div class="form-group">
+                 <!-- <div class="form-group">
                     <label for="dateAdded">Date Added:  </label>
-                    <input  class="form-control" id="dateAdded" name="dateAdded" type="date" value="" placeholder="Date format YYYY-MM-DD" required>
-                  </div>
+                    <input  class="form-control" id="dateAdded" name="dateAdded" type="text" value="" placeholder="Date format YYYY-MM-DD" required>
+                  </div> -->
                 
             </div>
             <div class="modal-footer">
@@ -90,7 +90,20 @@
       </div>
     </div>
             
-       <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      
+         
+       
+        <a href="AuthorController?action=home">Home</a>
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js"> </script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js">  </script>
+    </body>
+    
+   
+   
+</html>
+
+<!--
+ <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           
@@ -101,11 +114,11 @@
           </div>
           <div class="modal-body">
                 
-                  <input type="hidden" name="authorID" id="authorID" value="${a.id}" >
+                  <input type="hidden" name="authorID" id="authorID" value="${a.authorId}" >
                
                   <div class="form-group">
                     <label for="authorName">Author Name:  </label>
-                    <input  class="form-control" id="authorName" name="authorName" type="text" value="${a.name}" required>
+                    <input  class="form-control" id="authorName" name="authorName" type="text" value="${a.authorName}" required>
                    </div>
 
                   <div class="form-group">
@@ -122,7 +135,12 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+-->
+
+<!--
+
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <form id="deleteForm" name="deleteForm" method="POST" action="AuthorController?action=delete">  
@@ -132,11 +150,11 @@
           </div>
         <div class="modal-body">
                 
-                  <input type="hidden" name="authorID" id="authorID" value="${a.id}" >
+                  <input type="hidden" name="authorID" id="authorID" value="${a.authorId}" >
                                 
                   <div class="form-group">
                     <label for="authorName">Author Name:  </label>
-                    <input  class="form-control" id="authorName" name="authorName" type="text" value="${a.name}" required>
+                    <input  class="form-control" id="authorName" name="authorName" type="text" value="${a.authorName}" required>
                    </div>
 
                   <div class="form-group">
@@ -152,13 +170,5 @@
         </form>
         </div>
       </div>
-    </div>       
-       
-        <a href="AuthorController?action=home">Home</a>
-        <script src="https://code.jquery.com/jquery-2.1.4.min.js"> </script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js">  </script>
-    </body>
-    
-   
-   
-</html>
+    </div>
+-->
