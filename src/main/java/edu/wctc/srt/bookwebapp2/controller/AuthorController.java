@@ -113,7 +113,7 @@ public class AuthorController extends HttpServlet {
                      author.setDateAdded(new Date());
                           
                 }
-                
+                authService.create(author);
                 List<Author> authors = null;
                 authors = authService.findAll();
                 request.setAttribute("authors", authors);
@@ -162,7 +162,7 @@ public class AuthorController extends HttpServlet {
               //  Date date = sdf.parse(dateAdded);
                 author.setDateAdded(new Date());
               //  System.out.println("Changed name : " + author.getDateAdded());
-                
+                authService.edit(author);
                 List<Author> authors = null;
                 authors = authService.findAll();
                 request.setAttribute("authors", authors);
