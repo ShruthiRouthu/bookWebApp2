@@ -24,8 +24,10 @@
                 <th align="left" class="tableHead">ID</th>
                 <th align="left" class="tableHead">Author Name</th>
                 <th align="right" class="tableHead">Date Added</th>
+                <th align="left" class="tableHead">Books</th>
             </tr>
-        <c:forEach var="a" items="${authors}" varStatus="rowCount">
+        
+            <c:forEach var="a" items="${authors}" varStatus="rowCount">
             <c:choose>
                 <c:when test="${rowCount.count % 2 == 0}">
                     <tr style="background-color: white;">
@@ -36,17 +38,21 @@
             </c:choose>
             <td align="left">${a.authorId}</td>
             <td align="left">${a.authorName}</td>
-            <td align="right">
-                <fmt:formatDate pattern="M/d/yyyy" value="${a.dateAdded}"></fmt:formatDate>
+            <td align="right"><fmt:formatDate pattern="M/d/yyyy" value="${a.dateAdded}"></fmt:formatDate></td>
+            <td>
+                
+                
             </td>
+            
         </tr>
         </c:forEach>
         </table>
+        
         <c:if test="${errMsg != null}">
             <p style="font-weight: bold;color: red;width:500px;">Sorry, data could not be retrieved:<br>
                 ${errMsg}</p>
         </c:if>
             
-           <a href="AuthorController?action=home">Home</a>
+        <a href="AuthorController?action=home">Home</a>
     </body>
 </html>

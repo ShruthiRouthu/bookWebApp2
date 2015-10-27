@@ -13,7 +13,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Edit Author</title>
-         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     </head>
     <body bgcolor="${pageColor}" style="color: ${fontColor};">
         <h1>Edit Author</h1>
@@ -28,7 +28,16 @@
                   <div class="form-group">
                     <label for="authorName">Author Name:  </label>
                     <input  class="form-control" id="authorName" name="authorName" type="text" value="${author.authorName}" required>
-                   </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="bookDropDown">Books:  </label>
+                    <select id="booksDropDown" name="bookDropDown">
+                                    <c:forEach var="book" items="${author.bookSet}" varStatus="rowCount">                                       
+                                        <option value="${book.bookId}">${book.title}</option>
+                                    </c:forEach>
+                    </select>
+                  </div>
 
                 
                   <button type="submit" class="btn btn-primary">Save changes</button>

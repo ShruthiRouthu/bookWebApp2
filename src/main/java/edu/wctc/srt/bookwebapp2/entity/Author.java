@@ -8,7 +8,9 @@ package edu.wctc.srt.bookwebapp2.entity;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+
 import javax.persistence.Basic;
+import static javax.persistence.CascadeType.ALL;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -49,7 +51,7 @@ public class Author implements Serializable {
     @Column(name = "date_added")
     @Temporal(TemporalType.DATE)
     private Date dateAdded;
-    @OneToMany(mappedBy = "authorId")
+    @OneToMany(cascade = ALL,orphanRemoval = true, mappedBy = "authorId"  )
     private Set<Book> bookSet;
 
     public Author() {

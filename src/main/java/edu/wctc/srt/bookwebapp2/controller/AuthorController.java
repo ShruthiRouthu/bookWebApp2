@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
-// THis is the latest app with JPI
+// THis is the latest app with JPI as on  23/10/2015
 
 // Not using annotations bcause this servlet is configured using web.xml
 public class AuthorController extends HttpServlet {

@@ -22,6 +22,7 @@
                 <th align="left" class="tableHead">ID</th>
                 <th align="left" class="tableHead">Title</th>
                 <th align="left" class="tableHead">ISBN</th>
+                <th align="left" class="tableHead">Author</th>
             </tr>
         <c:forEach var="b" items="${books}" varStatus="rowCount">
             <c:choose>
@@ -34,9 +35,8 @@
             </c:choose>
             <td align="left">${b.bookId}</td>
             <td align="left">${b.title}</td>
-            <td align="right">
-               ${b.isbn}
-            </td>
+            <td align="right">${b.isbn}</td>
+            <td align="left">${b.authorId.authorName}</td>
         </tr>
         </c:forEach>
         </table>
