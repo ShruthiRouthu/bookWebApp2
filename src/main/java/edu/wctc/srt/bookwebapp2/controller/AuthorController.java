@@ -148,8 +148,7 @@ public class AuthorController extends HttpServlet {
            
                 author.setDateAdded(new Date());
                 authService.edit(author);
-                List<Author> authors = null;
-                authors = authService.findAll();
+                List<Author> authors = authService.findAll();
                 request.setAttribute("authors", authors);
                 destination = MANAGE_PAGE;
                 

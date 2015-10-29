@@ -38,12 +38,6 @@ public class AuthorService {
     public List<Author> findAll() {
         return authorRepo.findAll();
     }
-    
-    //custom method
-    public Author findByIdAndFetchBooksEagerly(String id){
-        Integer authorId = new Integer(id);
-        return authorRepo.findByIdAndFetchBooksEagerly(authorId);
-    }
 
     public Author findById(String id) {
         return authorRepo.findOne(new Integer(id));

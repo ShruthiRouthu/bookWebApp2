@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.wctc.srt.bookwebapp2.controller;
 
 import edu.wctc.srt.bookwebapp2.entity.Author;
@@ -11,22 +6,14 @@ import edu.wctc.srt.bookwebapp2.entity.Book;
 import edu.wctc.srt.bookwebapp2.service.AuthorService;
 import edu.wctc.srt.bookwebapp2.service.BookService;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.lang.reflect.Constructor;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Inject;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
