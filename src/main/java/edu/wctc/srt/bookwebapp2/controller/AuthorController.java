@@ -3,7 +3,8 @@ package edu.wctc.srt.bookwebapp2.controller;
 
 
 import edu.wctc.srt.bookwebapp2.entity.Author;
-import edu.wctc.srt.bookwebapp2.service.AbstractFacade;
+
+import edu.wctc.srt.bookwebapp2.service.AuthorService;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.text.SimpleDateFormat;
@@ -24,6 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 // THis is the latest app with JPI as on  23/10/2015
 
@@ -47,49 +50,46 @@ public class AuthorController extends HttpServlet {
     private static final String FONT_COLOR = "fontColor";
     private static final String PAGE_COLOR = "pageColor";
     
-    @Inject
-    private AbstractFacade<Author> authService;
-   
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
     // Session and context code------------------------------------
-        HttpSession session = request.getSession();
-        ServletContext ctx = request.getServletContext();
+//        HttpSession session = request.getSession();
+        ServletContext context = request.getServletContext();
+        
+
+        
+//        // Getting DATA from form
+//        String fontColor = request.getParameter(FONT_COLOR);
+//        String pageColor = request.getParameter(PAGE_COLOR);
+//    
+//        if(fontColor != null && fontColor.length() > 0)
+//        {
+//            context.setAttribute(FONT_COLOR,fontColor);
+//        }
+//        
+//        if(pageColor != null && pageColor.length() > 0)
+//        {
+//            session.setAttribute(PAGE_COLOR,pageColor);
+//        }
+    // Session and context code-----------------------------------
         
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
         
-        // Getting DATA from form
-        String fontColor = request.getParameter(FONT_COLOR);
-        String pageColor = request.getParameter(PAGE_COLOR);
-    
-        if(fontColor != null && fontColor.length() > 0)
-        {
-            ctx.setAttribute(FONT_COLOR,fontColor);
-        }
-        
-        if(pageColor != null && pageColor.length() > 0)
-        {
-            session.setAttribute(PAGE_COLOR,pageColor);
-        }
-    // Session and context code-----------------------------------
-        
         Author author = null;
 
-
-        
-// Getting AuthorService from Helper method using connectionPOOLS and dependency injection using init parameters        
-//        AuthorService authService = null;
-//        try{ 
-//            authService = getAuthorService();
-//        }
-//        catch (Exception ex){
-//            System.out.println(ex.getCause().getMessage());
-//        }
-
-      
+        /*
+            This is how you inject a Spring service object into your servlet. Note
+            that the bean name must match the name in your service class.
+        */
+        ServletContext sctx = getServletContext();
+        WebApplicationContext ctx
+                = WebApplicationContextUtils.getWebApplicationContext(sctx);
+        AuthorService authService = (AuthorService) ctx.getBean("authorService");
+              
         try {
             if (action.equals(LIST_ACTION)) {
                 
@@ -100,20 +100,13 @@ public class AuthorController extends HttpServlet {
 
             } else if (action.equals(ADD_ACTION)) {
                 String name  = request.getParameter("authorName");
-              //  String dateAdded = request.getParameter("dateAdded");
-              //  System.out.println(name + " " + dateAdded);
-              //  if((name != null) && (dateAdded != null))
                 if(name != null)
                 {
                      author = new Author(0);
                      author.setAuthorName(name);
-                     
-//                     SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
-//                     Date date = sdf.parse(dateAdded);
-                     author.setDateAdded(new Date());
-                          
+                     author.setDateAdded(new Date());       
                 }
-                authService.create(author);
+                authService.edit(author);
                 List<Author> authors = null;
                 authors = authService.findAll();
                 request.setAttribute("authors", authors);
@@ -124,7 +117,7 @@ public class AuthorController extends HttpServlet {
                 String id  = request.getParameter("authorID");
                 if(id != null)
                 {
-                    author = authService.find(new Integer(id));
+                    author = authService.findByIdAndEagerLoadBooks(id);
                     authService.remove(author);
                 }
                 
@@ -137,7 +130,7 @@ public class AuthorController extends HttpServlet {
                 String id  = request.getParameter("authorID");
                  if(id != null)
                 {
-                    author = authService.find(new Integer(id));
+                    author = authService.findByIdAndEagerLoadBooks(id);
                     if(author != null)
                     {
                         request.setAttribute("selectedAuth", author);
@@ -148,20 +141,12 @@ public class AuthorController extends HttpServlet {
             }else if (action.equals(EDIT_ACTION)) {
             
                 String name  = request.getParameter("authorName");
-               // String dateAdded = request.getParameter("dateAdded");
                 String id = request.getParameter("authorID"); 
-                
-               // System.out.println("variables from form" + name + " " + dateAdded + " " +id);
-               
-                author = authService.find(new Integer(id));
-              //  System.out.println("Before changing"+author.getAuthorId() + " " + author.getAuthorName() + " " + author.getDateAdded());
+            
+                author = authService.findByIdAndEagerLoadBooks(id);
                 author.setAuthorName(name);
-              //  System.out.println("Changed name : " + author.getAuthorName());
-              
-              //  SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
-              //  Date date = sdf.parse(dateAdded);
+           
                 author.setDateAdded(new Date());
-              //  System.out.println("Changed name : " + author.getDateAdded());
                 authService.edit(author);
                 List<Author> authors = null;
                 authors = authService.findAll();
@@ -175,8 +160,6 @@ public class AuthorController extends HttpServlet {
                 request.setAttribute("authors", authors);
                 destination = MANAGE_PAGE;   
             }else {
-                // no param identified in request, must be an error
-                //request.setAttribute("errMsg", NO_PARAM_ERR_MSG);
                 destination = LIST_PAGE;
             }
             
@@ -187,7 +170,7 @@ public class AuthorController extends HttpServlet {
         // Forward to destination page
        
         if(action.equals(HOME_ACTION)){
-            response.sendRedirect(ctx.getContextPath() + HOME_PAGE);
+            response.sendRedirect(context.getContextPath() + HOME_PAGE);
         }
         else {
         RequestDispatcher dispatcher
@@ -225,8 +208,8 @@ public class AuthorController extends HttpServlet {
             }
             // this runs when using connection pools
             else { 
-                Context ctx = new InitialContext();
-                DataSource ds = (DataSource) ctx.lookup("jdbc/book");
+                Context context = new InitialContext();
+                DataSource ds = (DataSource) context.lookup("jdbc/book");
 
                 authorDAOStrategy = new AuthorDAOUsingConnectionPool(new MySqlDbStrategy(),ds);
                 authorService =  new AuthorService(authorDAOStrategy);

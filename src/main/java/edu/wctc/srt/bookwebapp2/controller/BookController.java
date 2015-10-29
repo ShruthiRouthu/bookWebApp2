@@ -7,7 +7,9 @@ package edu.wctc.srt.bookwebapp2.controller;
 
 import edu.wctc.srt.bookwebapp2.entity.Author;
 import edu.wctc.srt.bookwebapp2.entity.Book;
-import edu.wctc.srt.bookwebapp2.service.AbstractFacade;
+
+import edu.wctc.srt.bookwebapp2.service.AuthorService;
+import edu.wctc.srt.bookwebapp2.service.BookService;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
@@ -25,6 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  *
@@ -63,10 +67,11 @@ public class BookController extends HttpServlet {
     private static final String ATTRIBUTE_AUTHORS = "authors" ;
     private static final String ATTRIBUTE_SELECTED_AUTHOR = "selectedAuthor";
     
-    @Inject
-    private AbstractFacade<Book> bookService;
-    @Inject
-    private AbstractFacade<Author> authorService;
+    ServletContext sctx = getServletContext();
+        WebApplicationContext ctx
+                = WebApplicationContextUtils.getWebApplicationContext(sctx);
+        BookService bookService = (BookService) ctx.getBean("bookService");
+        AuthorService authorService = (AuthorService) ctx.getBean("authorService");
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -82,7 +87,7 @@ public class BookController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
      
         String destination = "";
-        int book_id;
+        String book_id;
         
         String action = request.getParameter(PARAM_ACTION);
 
@@ -108,7 +113,7 @@ public class BookController extends HttpServlet {
                 
                 case ACTION_EDIT_PAGE :
                     book_id = getParameterBook_id(request);
-                    Book selectedBook = bookService.find(book_id);
+                    Book selectedBook = bookService.findById(book_id);
                     request.setAttribute(ATTRIBUTE_SELECTED_BOOK, selectedBook);
                     resetAuthorList(request,authorService);
                     destination = PAGE_EDIT;
@@ -121,8 +126,8 @@ public class BookController extends HttpServlet {
                     
                 case ACTION_DELETE :
                     book_id = getParameterBook_id(request);
-                    if(book_id != -1){
-                        selectedBook = bookService.find(book_id);
+                    if(book_id != null){
+                        selectedBook = bookService.findById(book_id);
                         bookService.remove(selectedBook);
                     }
                     resetBookList(request,bookService);
@@ -137,7 +142,7 @@ public class BookController extends HttpServlet {
                     String authorId  = request.getParameter(PARAM_AUTHORID);
                     Author author = null;
                     if((authorId != null) && ( Integer.parseInt(authorId)!= -1 )){
-                        author = authorService.find(Integer.parseInt(authorId));
+                        author = authorService.findById(authorId);
                     }
                    
                     
@@ -145,18 +150,18 @@ public class BookController extends HttpServlet {
                     Book book = null ;                       
                     
                     // Logic to decide between INSERT or UPDATE
-                    if(book_id == -1){ 
+                    if(book_id == null){ 
                         book = new Book(0);
                         book.setIsbn(isbn);
                         book.setTitle(title);
                         if(author != null){
                             book.setAuthorId(author);
                         }
-                        bookService.create(book);
+                        bookService.edit(book);
    
                     }                       
                     else{
-                        book = bookService.find(new Integer(book_id)) ;
+                        book = bookService.findById(book_id) ;
                         book.setIsbn(isbn);
                         book.setTitle(title);
                         if(author != null){
@@ -183,21 +188,21 @@ public class BookController extends HttpServlet {
         
     }
 
-    private int getParameterBook_id(HttpServletRequest request){
-        int book_id = -1; //flag
+    private String getParameterBook_id(HttpServletRequest request){
+        String book_id = null ;//= -1; //flag
         String temp = request.getParameter(PARAM_BOOKID);
         if(temp != null){
-            book_id = Integer.parseInt(temp);
+            book_id = temp;
         }
         return book_id;
     }
     
-    private void resetBookList(HttpServletRequest request, AbstractFacade<Book> bookService) throws SQLException,Exception{
+    private void resetBookList(HttpServletRequest request, BookService bookService) throws SQLException,Exception{
         List<Book> books = bookService.findAll(); 
         request.setAttribute(ATTRIBUTE_BOOKS ,books);
     }
     
-    private void resetAuthorList(HttpServletRequest request, AbstractFacade<Author> authorService) throws SQLException,Exception{
+    private void resetAuthorList(HttpServletRequest request, AuthorService authorService) throws SQLException,Exception{
         List<Author> authors = authorService.findAll(); 
         request.setAttribute(ATTRIBUTE_AUTHORS ,authors);
     }
