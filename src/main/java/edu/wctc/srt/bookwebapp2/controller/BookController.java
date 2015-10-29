@@ -54,11 +54,7 @@ public class BookController extends HttpServlet {
     private static final String ATTRIBUTE_AUTHORS = "authors" ;
     private static final String ATTRIBUTE_SELECTED_AUTHOR = "selectedAuthor";
     
-    ServletContext sctx = getServletContext();
-        WebApplicationContext ctx
-                = WebApplicationContextUtils.getWebApplicationContext(sctx);
-        BookService bookService = (BookService) ctx.getBean("bookService");
-        AuthorService authorService = (AuthorService) ctx.getBean("authorService");
+  
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -73,6 +69,12 @@ public class BookController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
      
+          ServletContext sctx = getServletContext();
+        WebApplicationContext ctx
+                = WebApplicationContextUtils.getWebApplicationContext(sctx);
+        BookService bookService = (BookService) ctx.getBean("bookService");
+        AuthorService authorService = (AuthorService) ctx.getBean("authorService");
+        
         String destination = "";
         String book_id;
         

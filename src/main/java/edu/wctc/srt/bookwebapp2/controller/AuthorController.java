@@ -57,7 +57,7 @@ public class AuthorController extends HttpServlet {
 
     // Session and context code------------------------------------
 //        HttpSession session = request.getSession();
-        ServletContext context = request.getServletContext();
+ //       ServletContext context = request.getServletContext();
         
 
         
@@ -169,7 +169,7 @@ public class AuthorController extends HttpServlet {
         // Forward to destination page
        
         if(action.equals(HOME_ACTION)){
-            response.sendRedirect(context.getContextPath() + HOME_PAGE);
+            response.sendRedirect(sctx.getContextPath() + HOME_PAGE);
         }
         else {
         RequestDispatcher dispatcher
