@@ -8,6 +8,8 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -17,32 +19,38 @@
     </head>
     <body bgcolor="${pageColor}" style="color: ${fontColor};">
         <h1>Edit Author</h1>
-         
+
         <form id="editForm" name="editForm" method="POST" action="AuthorController?action=edit">
-            
-         
-                  <c:set var="author" scope="page" value="${selectedAuth}"/> 
-                
-                  <input type="hidden" name="authorID" id="authorID" value="${author.authorId}" >
-               
-                  <div class="form-group">
+            <sec:authorize access="hasAnyRole('ROLE_MGR')">    
+
+                <c:set var="author" scope="page" value="${selectedAuth}"/> 
+
+                <input type="hidden" name="authorID" id="authorID" value="${author.authorId}" >
+
+                <div class="form-group">
                     <label for="authorName">Author Name:  </label>
                     <input  class="form-control" id="authorName" name="authorName" type="text" value="${author.authorName}" required>
-                  </div>
-                  
-                  <div class="form-group">
+                </div>
+
+                <div class="form-group">
                     <label for="bookDropDown">Books:  </label>
                     <select id="booksDropDown" name="bookDropDown">
-                                    <c:forEach var="book" items="${author.bookSet}" varStatus="rowCount">                                       
-                                        <option value="${book.bookId}">${book.title}</option>
-                                    </c:forEach>
+                        <c:forEach var="book" items="${author.bookSet}" varStatus="rowCount">                                       
+                            <option value="${book.bookId}">${book.title}</option>
+                        </c:forEach>
                     </select>
-                  </div>
+                </div>
 
-                
-                  <button type="submit" class="btn btn-primary">Save changes</button>
-        
+
+                <button type="submit" class="btn btn-primary">Save changes</button>
+
+            </sec:authorize>
         </form>
+
+        <sec:authorize access="hasAnyRole('ROLE_MGR','ROLE_USER')">
+            Logged in as: <sec:authentication property="principal.username"></sec:authentication> ::
+            <a href='<%= this.getServletContext().getContextPath() + "/j_spring_security_logout"%>'>Log Me Out</a>
+        </sec:authorize>           
     </body>
 </html>
 

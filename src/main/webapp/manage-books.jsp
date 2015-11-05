@@ -8,6 +8,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -16,54 +17,61 @@
     </head>
     <body>
         <h1>Manage Books</h1>
-        
-        <table width="500" border="1" cellspacing="0" cellpadding="4">
-            <tr style="background-color: black;color:white;">
-                <th align="left" class="tableHead">ID</th>
-                <th align="left" class="tableHead">Title</th>
-                <th align="right" class="tableHead">ISBN</th>
-                <th align="left" class="tableHead">Author</th>
-            </tr>
-        <c:forEach var="b" items="${books}" varStatus="rowCount">
-            <c:choose>
-                <c:when test="${rowCount.count % 2 == 0}">
-                    <tr style="background-color: white;">
-                </c:when>
-                <c:otherwise>
-                    <tr style="background-color: #ccffff;">
-                </c:otherwise>
-            </c:choose>
-                        
-            <td align="left">${b.bookId}</td>
-            <td align="left">${b.title}</td>
-            <td align="right">${b.isbn}</td>
-            <td align="left">${b.authorId.authorName}</td>
-            
-            <td> <input type="button" name="deleteBook" value="Delete" onclick="location.href='BookController?action=delete&bookId=${b.bookId}'" /></td>
-    
-            <td> <input type="button" name="editAuthor" value="Edit" onclick="location.href='BookController?action=showEditPage&bookId=${b.bookId}'"></td>                
-                 
-           
-         </c:forEach>
-            
+        <sec:authorize access="hasAnyRole('ROLE_MGR')">
+            <table width="500" border="1" cellspacing="0" cellpadding="4">
+
+                <tr style="background-color: black;color:white;">
+                    <th align="left" class="tableHead">ID</th>
+                    <th align="left" class="tableHead">Title</th>
+                    <th align="right" class="tableHead">ISBN</th>
+                    <th align="left" class="tableHead">Author</th>
+                </tr>
+                <c:forEach var="b" items="${books}" varStatus="rowCount">
+                    <c:choose>
+                        <c:when test="${rowCount.count % 2 == 0}">
+                            <tr style="background-color: white;">
+                            </c:when>
+                            <c:otherwise>
+                            <tr style="background-color: #ccffff;">
+                            </c:otherwise>
+                        </c:choose>
+
+                        <td align="left">${b.bookId}</td>
+                        <td align="left">${b.title}</td>
+                        <td align="right">${b.isbn}</td>
+                        <td align="left">${b.authorId.authorName}</td>
+
+                        <td> <input type="button" name="deleteBook" value="Delete" onclick="location.href='BookController?action=delete&bookId=${b.bookId}'" /></td>
+
+                        <td> <input type="button" name="editAuthor" value="Edit" onclick="location.href='BookController?action=showEditPage&bookId=${b.bookId}'"></td>                
+
+
+                    </c:forEach>
+
             </table>
-            
-            
+
+
             <c:if test="${errMsg != null}">
                 <p style="font-weight: bold;color: red;width:500px;">Sorry, data could not be retrieved:<br>
                     ${errMsg}</p>
-            </c:if>
-            
+                </c:if>
+
+
             <br>
             <input type="button"  name="addAuthor"  value="Add" onclick="location.href='BookController?action=showAddPage'" >
             <br>
-    
-        
-        
-        
+        </sec:authorize>
+
+
+
         <a href="BookController?action=showHomePage">Home</a>
+
+        <sec:authorize access="hasAnyRole('ROLE_MGR','ROLE_USER')">
+            Logged in as: <sec:authentication property="principal.username"></sec:authentication> ::
+            <a href='<%= this.getServletContext().getContextPath() + "/j_spring_security_logout"%>'>Log Me Out</a>
+        </sec:authorize> 
         <script src="https://code.jquery.com/jquery-2.1.4.min.js"> </script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js">  </script>
-        
+
     </body>
 </html>

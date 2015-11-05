@@ -8,92 +8,101 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <!DOCTYPE html>
 <html>
+    
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Manage Authors</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     </head>
+    
     <body style="background-color: ${pageColor};color: ${fontColor};">
         <h1> Manage  Authors</h1>
-        
-            
+
+        <sec:authorize access="hasAnyRole('ROLE_MGR')">
         <table width="500" border="1" cellspacing="0" cellpadding="4">
             <tr style="background-color: black;color:white;">
                 <th align="left" class="tableHead">ID</th>
                 <th align="left" class="tableHead">Author Name</th>
                 <th align="right" class="tableHead">Date Added</th>
             </tr>
-        <c:forEach var="a" items="${authors}" varStatus="rowCount">
-            <c:choose>
-                <c:when test="${rowCount.count % 2 == 0}">
-                    <tr style="background-color: white;">
-                </c:when>
-                <c:otherwise>
-                    <tr style="background-color: #ccffff;">
-                </c:otherwise>
-            </c:choose>
-                        
-            <td align="left">${a.authorId}</td>
-            <td align="left">${a.authorName}</td>
-            <td align="right"><fmt:formatDate pattern="M/d/yyyy" value="${a.dateAdded}"></fmt:formatDate></td>
-            
-            <td> <input type="button" name="deleteAuthor" value="Delete" onclick="location.href='AuthorController?action=delete&authorID=${a.authorId}'" /></td>
-    
-            <td> <input type="button" name="editAuthor" value="Edit" onclick="location.href='AuthorController?action=showEditPage&authorID=${a.authorId}'"></td>                
-                 
-           
-            </tr>
-        </c:forEach>
-            
-            </table>
-            
-            
-            <c:if test="${errMsg != null}">
-                <p style="font-weight: bold;color: red;width:500px;">Sorry, data could not be retrieved:<br>
-                    ${errMsg}</p>
-            </c:if>
-            
-            <br>
-            <input type="button"  name="addAuthor"  value="Add" data-toggle="modal" data-target="#addModal" >
-            <br>
-    
-    <!-- Bootstrap Modal Dialog Boxes -->        
-    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <form id="addForm" name="addForm" method="POST" action="AuthorController?action=add">  
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Add Author</h4>
-          </div>
-            <div class="modal-body">
-                                                               
-                  <div class="form-group">
-                    <label for="authorName">Author Name:  </label>
-                    <input  class="form-control" id="authorName" name="authorName" type="text" value="" required>
-                   </div>
+            <c:forEach var="a" items="${authors}" varStatus="rowCount">
+                <c:choose>
+                    <c:when test="${rowCount.count % 2 == 0}">
+                        <tr style="background-color: white;">
+                        </c:when>
+                        <c:otherwise>
+                        <tr style="background-color: #ccffff;">
+                        </c:otherwise>
+                    </c:choose>
 
-                 <!-- <div class="form-group">
-                    <label for="dateAdded">Date Added:  </label>
-                    <input  class="form-control" id="dateAdded" name="dateAdded" type="text" value="" placeholder="Date format YYYY-MM-DD" required>
-                  </div> -->
-                
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Add</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-            
-      
-         
+                    <td align="left">${a.authorId}</td>
+                    <td align="left">${a.authorName}</td>
+                    <td align="right"><fmt:formatDate pattern="M/d/yyyy" value="${a.dateAdded}"></fmt:formatDate></td>
+
+                        <td> <input type="button" name="deleteAuthor" value="Delete" onclick="location.href='AuthorController?action=delete&authorID=${a.authorId}'" /></td>
+
+                    <td> <input type="button" name="editAuthor" value="Edit" onclick="location.href='AuthorController?action=showEditPage&authorID=${a.authorId}'"></td>                
+
+
+                </tr>
+            </c:forEach>
+
+        </table>
+
+
+        <c:if test="${errMsg != null}">
+            <p style="font-weight: bold;color: red;width:500px;">Sorry, data could not be retrieved:<br>
+                ${errMsg}</p>
+        </c:if>
+
+        <br>
+        <input type="button"  name="addAuthor"  value="Add" data-toggle="modal" data-target="#addModal" >
+        <br>
+
        
+        
+        <!-- Bootstrap Modal Dialog Boxes -->        
+        <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form id="addForm" name="addForm" method="POST" action="AuthorController?action=add">  
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Add Author</h4>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="form-group">
+                                <label for="authorName">Author Name:  </label>
+                                <input  class="form-control" id="authorName" name="authorName" type="text" value="" required>
+                            </div>
+
+                            <!-- <div class="form-group">
+                               <label for="dateAdded">Date Added:  </label>
+                               <input  class="form-control" id="dateAdded" name="dateAdded" type="text" value="" placeholder="Date format YYYY-MM-DD" required>
+                             </div> -->
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+         </sec:authorize>
         <a href="AuthorController?action=home">Home</a>
+
+        <sec:authorize access="hasAnyRole('ROLE_MGR','ROLE_USER')">
+            Logged in as: <sec:authentication property="principal.username"></sec:authentication> ::
+            <a href='<%= this.getServletContext().getContextPath() + "/j_spring_security_logout"%>'>Log Me Out</a>
+        </sec:authorize> 
+
         <script src="https://code.jquery.com/jquery-2.1.4.min.js"> </script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js">  </script>
     </body>
