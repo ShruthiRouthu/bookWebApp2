@@ -69,7 +69,7 @@ public class BookController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
      
-          ServletContext sctx = getServletContext();
+        ServletContext sctx = getServletContext();
         WebApplicationContext ctx
                 = WebApplicationContextUtils.getWebApplicationContext(sctx);
         BookService bookService = (BookService) ctx.getBean("bookService");
