@@ -3,6 +3,7 @@ package edu.wctc.srt.bookwebapp2.controller;
 
 
 import edu.wctc.srt.bookwebapp2.entity.Author;
+import edu.wctc.srt.bookwebapp2.entity.Book;
 
 import edu.wctc.srt.bookwebapp2.service.AuthorService;
 import java.io.IOException;
@@ -10,7 +11,9 @@ import java.lang.reflect.Constructor;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
@@ -57,10 +60,7 @@ public class AuthorController extends HttpServlet {
 
     // Session and context code------------------------------------
 //        HttpSession session = request.getSession();
- //       ServletContext context = request.getServletContext();
-        
-
-        
+        //       ServletContext context = request.getServletContext();
 //        // Getting DATA from form
 //        String fontColor = request.getParameter(FONT_COLOR);
 //        String pageColor = request.getParameter(PAGE_COLOR);
@@ -74,109 +74,109 @@ public class AuthorController extends HttpServlet {
 //        {
 //            session.setAttribute(PAGE_COLOR,pageColor);
 //        }
-    // Session and context code-----------------------------------
-        
+        // Session and context code-----------------------------------
         String destination = LIST_PAGE;
         String action = request.getParameter(ACTION_PARAM);
-        
+
         Author author = null;
 
         /*
-            This is how you inject a Spring service object into your servlet. Note
-            that the bean name must match the name in your service class.
-        */
+         This is how you inject a Spring service object into your servlet. Note
+         that the bean name must match the name in your service class.
+         */
         ServletContext sctx = getServletContext();
         WebApplicationContext ctx
                 = WebApplicationContextUtils.getWebApplicationContext(sctx);
         AuthorService authService = (AuthorService) ctx.getBean("authorService");
-              
+
+        String id = null;
         try {
             if (action.equals(LIST_ACTION)) {
-                
+
                 List<Author> authors = null;
                 authors = authService.findAll();
                 request.setAttribute("authors", authors);
                 destination = LIST_PAGE;
 
+            } else if (action.equals(MANAGE_ACTION)) {
+
+                List<Author> authors = null;
+                authors = authService.findAll();
+                request.setAttribute("authors", authors);
+                destination = MANAGE_PAGE;
+
+            } else if (action.equals(SHOW_EDITPAGE_ACTION)) {
+                id = request.getParameter("authorID");
+                if (id != null) {
+                    author = authService.findByIdAndEagerLoadBooks(id);
+                    if (author != null) {
+                        Set<Book> bookSet = author.getBookSet();
+                        request.setAttribute("bookSet", bookSet);
+                        
+                    } else {
+                        author = authService.findById(id);
+                        request.setAttribute("bookSet", new HashSet<>());
+                    }
+                    request.setAttribute("selectedAuth", author);
+                    destination = EDIT_PAGE;
+                }
             } else if (action.equals(ADD_ACTION)) {
-                String name  = request.getParameter("authorName");
-                if(name != null)
-                {
-                     author = new Author(0);
-                     author.setAuthorName(name);
-                     author.setDateAdded(new Date());       
+
+                String name = request.getParameter("authorName");
+                if (name != null) {
+                    author = new Author(0);
+                    author.setAuthorName(name);
+                    author.setDateAdded(new Date());
                 }
                 authService.edit(author);
                 List<Author> authors = null;
                 authors = authService.findAll();
                 request.setAttribute("authors", authors);
                 destination = MANAGE_PAGE;
-                
-                
+
             } else if (action.equals(DELETE_ACTION)) {
-                String id  = request.getParameter("authorID");
-                if(id != null)
-                {
-                    author = authService.findByIdAndEagerLoadBooks(id);
+                id = request.getParameter("authorID");
+                if (id != null) {
+                    author = authService.findById(id);
                     authService.remove(author);
                 }
-                
+
                 List<Author> authors = null;
                 authors = authService.findAll();
                 request.setAttribute("authors", authors);
                 destination = MANAGE_PAGE;
-                               
-            } else if (action.equals(SHOW_EDITPAGE_ACTION)) {
-                String id  = request.getParameter("authorID");
-                 if(id != null)
-                {
-                    author = authService.findByIdAndEagerLoadBooks(id);
-                    if(author != null)
-                    {
-                        request.setAttribute("selectedAuth", author);
-                        destination = EDIT_PAGE;
-                    }
-                }
-            
-            }else if (action.equals(EDIT_ACTION)) {
-            
-                String name  = request.getParameter("authorName");
-                String id = request.getParameter("authorID"); 
-            
-                author = authService.findByIdAndEagerLoadBooks(id);
+
+            } else if (action.equals(EDIT_ACTION)) {
+
+                String name = request.getParameter("authorName");
+                id = request.getParameter("authorID");
+
+                author = authService.findById(id);
                 author.setAuthorName(name);
-           
+
                 author.setDateAdded(new Date());
                 authService.edit(author);
                 List<Author> authors = authService.findAll();
                 request.setAttribute("authors", authors);
                 destination = MANAGE_PAGE;
-                
-            } else if (action.equals(MANAGE_ACTION)) { 
-                
-                List<Author> authors = null;
-                authors = authService.findAll();
-                request.setAttribute("authors", authors);
-                destination = MANAGE_PAGE;   
-            }else {
+
+            } else {
                 destination = LIST_PAGE;
             }
-            
+
         } catch (Exception e) {
             request.setAttribute("errMsg", e.getCause().getMessage());
         }
 
         // Forward to destination page
-       
-        if(action.equals(HOME_ACTION)){
+        if (action.equals(HOME_ACTION)) {
             response.sendRedirect(sctx.getContextPath() + HOME_PAGE);
+        } else {
+            RequestDispatcher dispatcher
+                    = getServletContext().getRequestDispatcher(destination);
+            dispatcher.forward(request, response);
         }
-        else {
-        RequestDispatcher dispatcher
-                = getServletContext().getRequestDispatcher(destination);
-        dispatcher.forward(request, response);
-        }
-        
+
     }
     
   /*  private AuthorService getAuthorService() throws Exception {

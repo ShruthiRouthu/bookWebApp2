@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import static javax.persistence.CascadeType.ALL;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -51,7 +52,7 @@ public class Author implements Serializable {
     @Column(name = "date_added")
     @Temporal(TemporalType.DATE)
     private Date dateAdded;
-    @OneToMany(cascade = ALL,orphanRemoval = true, mappedBy = "authorId"  )
+    @OneToMany(cascade = CascadeType.ALL , orphanRemoval = true, mappedBy = "authorId"  )
     private Set<Book> bookSet;
 
     public Author() {

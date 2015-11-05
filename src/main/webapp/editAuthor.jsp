@@ -17,8 +17,9 @@
         <title>Edit Author</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     </head>
+    
     <body bgcolor="${pageColor}" style="color: ${fontColor};">
-        <h1>Edit Author</h1>
+        <h1>Add/Edit Author</h1>
 
         <form id="editForm" name="editForm" method="POST" action="AuthorController?action=edit">
             <sec:authorize access="hasAnyRole('ROLE_MGR')">    
@@ -31,17 +32,32 @@
                     <label for="authorName">Author Name:  </label>
                     <input  class="form-control" id="authorName" name="authorName" type="text" value="${author.authorName}" required>
                 </div>
+                
+                <c:choose>
+                    <c:when test="${not empty bookSet}">
 
-                <div class="form-group">
-                    <label for="bookDropDown">Books:  </label>
-                    <select id="booksDropDown" name="bookDropDown">
-                        <c:forEach var="book" items="${author.bookSet}" varStatus="rowCount">                                       
-                            <option value="${book.bookId}">${book.title}</option>
-                        </c:forEach>
-                    </select>
-                </div>
-
-
+                        <div class="form-group">
+                            <label for="bookDropDown">Books:  </label>
+                            <select id="booksDropDown" name="bookDropDown">
+                                <c:forEach var="book" items="${bookSet}" varStatus="rowCount">                                       
+                                    <option value="${book.bookId}">${book.title}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        
+                    </c:when>
+                    <c:otherwise>
+                      
+                        <div class="form-group">
+                            <label for="bookDropDown2">Books:  </label>
+                            <select id="booksDropDown2" name="bookDropDown">                                      
+                                    <option value="">none</option>  
+                            </select>
+                        </div>
+                       
+                    </c:otherwise>
+                </c:choose>
+                
                 <button type="submit" class="btn btn-primary">Save changes</button>
 
             </sec:authorize>
