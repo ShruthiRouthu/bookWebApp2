@@ -36,6 +36,8 @@ public class AuthorService {
     }
 
     public List<Author> findAll() {
+    //    LOG.error("*** Calling findAll method");
+    //    LOG.warn();    
         return authorRepo.findAll();
     }
 

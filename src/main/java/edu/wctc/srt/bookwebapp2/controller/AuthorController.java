@@ -6,7 +6,10 @@ import edu.wctc.srt.bookwebapp2.entity.Author;
 import edu.wctc.srt.bookwebapp2.entity.Book;
 
 import edu.wctc.srt.bookwebapp2.service.AuthorService;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,6 +20,12 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonReader;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.servlet.RequestDispatcher;
@@ -52,6 +61,8 @@ public class AuthorController extends HttpServlet {
     private static final String HOME_ACTION = "home";
     private static final String FONT_COLOR = "fontColor";
     private static final String PAGE_COLOR = "pageColor";
+    private static final String AJAX_LIST_ACTION = "listAjax";
+    private static final String AJAX_FINDBY_ID = "findByIdAjax";
     
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -88,10 +99,58 @@ public class AuthorController extends HttpServlet {
         WebApplicationContext ctx
                 = WebApplicationContextUtils.getWebApplicationContext(sctx);
         AuthorService authService = (AuthorService) ctx.getBean("authorService");
+        PrintWriter out = response.getWriter();
 
         String id = null;
         try {
-            if (action.equals(LIST_ACTION)) {
+            if(action.equals(AJAX_LIST_ACTION)){
+                    List<Author> authors = authService.findAll();
+                    JsonArrayBuilder jsonArrayBuilder = Json.createArrayBuilder();
+
+                    authors.forEach((authorObj) -> {
+                        jsonArrayBuilder.add(
+                                Json.createObjectBuilder()
+                                .add("authorId", authorObj.getAuthorId())
+                                .add("authorName", authorObj.getAuthorName())
+                                .add("dateAdded", authorObj.getDateAdded().toString())
+                        );
+                    });
+
+                    JsonArray authorsJson = jsonArrayBuilder.build();
+                    response.setContentType("application/json");
+                    out.write(authorsJson.toString());
+                    out.flush();
+                    return; // must not continue at bottom!
+            }        
+            else if(action.equals(AJAX_FINDBY_ID)) {
+                    out = response.getWriter();
+                    StringBuilder sb = new StringBuilder();
+                    BufferedReader br = request.getReader();
+                    try {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line).append('\n');
+                        }
+                    } finally {
+                        br.close();
+                    }
+
+                    String jsonPayload = sb.toString();
+                    JsonReader reader = Json.createReader(new StringReader(jsonPayload));
+                    JsonObject authorIdObj = reader.readObject();
+                    Author authorObj = authService.findById(authorIdObj.getString("authorId"));
+                    JsonObjectBuilder builder = Json.createObjectBuilder()
+                            .add("authorId", authorObj.getAuthorId())
+                            .add("authorName", authorObj.getAuthorName())
+                            .add("dateAdded", authorObj.getDateAdded().toString());
+
+                    JsonObject authorJson = builder.build();
+                    response.setContentType("application/json");
+                    out.write(authorJson.toString());
+                    out.flush();
+                    return;
+            }
+            else if (action.equals(LIST_ACTION)) {
 
                 List<Author> authors = null;
                 authors = authService.findAll();

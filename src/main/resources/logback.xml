@@ -2,18 +2,23 @@
 
 <configuration debug="false">
 
+    <!-- you can have other appenders like file, "rolling policy","filename pattern","max-history" read up -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
         </encoder>
     </appender>
+    <!-- to change looging pattern resd their documnetation -->
 
     <!-- child level logging for application -->
-    <logger name="edu.wctc.web.demo.bookwebapp" level="DEBUG" />
-    <logger name="org.springframework" level="INFO" />
+    <logger name="edu.wctc.srt.bookwebapp2" level="DEBUG" />
+    <!--everything defaults to INFO and you are over writing default setting to DEBUG -->
+    <!-- this means only debug mesages will be logged others will be ignored -->
+    <logger name="org.springframework" level="DEBUG" />
 
     <!-- root level logging (children can override) -->
-    <root level="WARN">
+    <!-- if something happens to glassfish it will be written to INFO -->
+    <root level="INFO">
         <!-- appender-ref ref="FILE" / -->
         <appender-ref ref="STDOUT" />
     </root>
