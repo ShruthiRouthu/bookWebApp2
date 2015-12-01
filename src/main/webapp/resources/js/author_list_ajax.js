@@ -45,7 +45,7 @@
             });
         }
         
-         $authorTableBody.on('click', 'tr', function () {
+        $authorTableBody.on('click', 'tr', function () {
             console.log('row click event fired');
             var authorId = $(this).find("td").contents()[0].data;
             console.log(authorId);
