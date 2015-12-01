@@ -33,8 +33,8 @@
     
     <jpa:repositories base-package="edu.wctc.srt.bookwebapp2.repository" />
     
-        <!-- Begin Spring Security Config -->
-      <!-- begin Spring Security config -->
+    
+    <!-- begin Spring Security config -->
     <sec:global-method-security secured-annotations="enabled" />
 
     <!-- Don't SSL encrypt static resources -->
@@ -56,6 +56,12 @@
         
         <sec:intercept-url pattern="/loginerror.jsp" 
                            access="isAnonymous()" requires-channel="https"/>
+       
+        <!-- Rest security -->
+        <sec:intercept-url 
+            pattern="/api/v1/*" method="DELETE"
+            access="hasAnyRole('ROLE_USER', 'ROLE_MGR')" requires-channel="https" />
+        <!-- Rest security -->
         
         <sec:intercept-url 
             pattern="/**" 

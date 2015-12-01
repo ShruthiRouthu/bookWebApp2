@@ -11,7 +11,7 @@
         
         $document.ready(function(){
             
-            console.log("document ready event fired!");
+            alert("document ready event fired!");
             
             // Make sure we only do this on pages with an author list
             if ($body.attr('class') === 'authorList') {
